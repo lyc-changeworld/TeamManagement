@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    //values-v23网上说在android 6.0系统之后为24dp
+    <dimen name="toolbar_padding_top">24dp</dimen>
+</resources>

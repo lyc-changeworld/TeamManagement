@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--android:key 对于要保留数据值的首选项,必须拥有此属性.
+    它指定系统在将此设置的值保存在 SharedPreferences 中时所用的唯一键（字符串）-->
+    <!--设置自定义的类别栏布局
+    android:layout="@layout/preference_category_widget"-->
+    <PreferenceCategory
+        android:title="@string/preference_category_title_0">
+        <CheckBoxPreference
+            android:key="@string/preference_key_0"
+            android:title="@string/preference_title_0"
+            android:summary="@string/preference_summary_0"
+            android:defaultValue="false"/>
+        <SwitchPreference
+            android:key="@string/preference_key_1"
+            android:title="@string/preference_title_1"
+            android:summary="@string/preference_summary_1"
+            android:defaultValue="false">
+        </SwitchPreference>
+        <!--设置自定义的设置栏的布局
+        android:layout="@layout/preference_item"-->
+        <Preference
+            android:key="@string/preference_key_2"
+            android:title="@string/preference_title_2"
+            android:summary="@string/preference_summary_2"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/preference_category_title_1">
+        <Preference
+            android:key="@string/preference_key_3"
+            android:title="@string/preference_title_3"
+            android:summary="@string/preference_summary_3">
+        </Preference>
+        <Preference
+            android:key="@string/preference_key_4"
+            android:title="@string/preference_title_4"
+            android:summary="@string/preference_summary_4"/>
+    </PreferenceCategory>
+</PreferenceScreen>

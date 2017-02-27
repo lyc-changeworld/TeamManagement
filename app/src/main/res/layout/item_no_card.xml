@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="70dp">
+    <com.example.achuan.materialtemplate.widget.SquareImageView
+        android:id="@+id/square_iv"
+        android:scaleType="centerCrop"
+        android:transitionName="shareView"
+        android:layout_width="70dp"
+        android:layout_height="match_parent"
+        android:padding="10dp"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_margin="8dp"
+        android:layout_height="wrap_content">
+        <!--标题-->
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:ellipsize="end"
+            android:textColor="@color/colorText"
+            android:textSize="15sp"/>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <!--内容-->
+            <TextView
+                android:id="@+id/tv_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/comment_reply"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:textSize="13sp"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

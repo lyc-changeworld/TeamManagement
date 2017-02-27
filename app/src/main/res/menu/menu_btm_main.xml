@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--app:showAsAction来指定按钮的显示位置
+    　　　always:永远显示在控件栏中
+    　　　ifRoom:屏幕空间足够时显示,不够就显示在菜单当中
+    　　　never:永远显示在菜单当中-->
+    <item
+        android:id="@+id/bottom_0"
+        android:icon="@drawable/ic_chat_bubble_grey_600_24dp"
+        app:showAsAction="ifRoom"
+        android:enabled="true"
+        android:title="@string/bottom_title_0">
+    </item>
+    <item
+        android:id="@+id/bottom_1"
+        android:icon="@drawable/ic_contacts_grey_600_24dp"
+        app:showAsAction="ifRoom"
+        android:enabled="true"
+        android:title="@string/bottom_title_1">
+    </item>
+    <item
+        android:id="@+id/bottom_2"
+        android:icon="@drawable/ic_explore_grey_600_24dp"
+        app:showAsAction="ifRoom"
+        android:enabled="true"
+        android:title="@string/bottom_title_2">
+    </item>
+    <item
+        android:id="@+id/bottom_3"
+        android:icon="@drawable/ic_person_grey_600_24dp"
+        app:showAsAction="ifRoom"
+        android:enabled="true"
+        android:title="@string/bottom_title_3">
+    </item>
+</menu>

@@ -1,0 +1,37 @@
+<resources>
+    <!--1-普通量-->
+    <string name="app_name">TeamManagement</string>
+
+    <!--2-BottomNavMenu中的菜单项的标题-->
+    <string name="bottom_title_0">消息</string>
+    <string name="bottom_title_1">联系人</string>
+    <string name="bottom_title_2">发现</string>
+    <string name="bottom_title_3">我的</string>
+
+    <!--3-主界面toolbar中的菜单项-->
+    <string name="toolbar_main_title_0">搜索</string>
+    <string name="toolbar_main_title_1">添加</string>
+    <string name="toolbar_main_title_2">添加朋友</string>
+    <string name="toolbar_main_title_3">扫一扫</string>
+
+
+    <!--3-Preference个人喜好相关内容-->
+    <string name="preference_category_title_0">通用</string>
+    <string name="preference_category_title_1">其它说明</string>
+    <string name="preference_key_0">save_net_mode</string>
+    <string name="preference_key_1">light_mode</string>
+    <string name="preference_key_2">clear_cache</string>
+    <string name="preference_key_3">check_updates</string>
+    <string name="preference_key_4">project_address</string>
+    <string name="preference_title_0">省流量模式</string>
+    <string name="preference_title_1">夜间模式</string>
+    <string name="preference_title_2">清空缓存</string>
+    <string name="preference_title_3">检查更新</string>
+    <string name="preference_title_4">项目的GitHub地址</string>
+    <string name="preference_summary_0">仅在Wi-Fi环境下才自动加载图片</string>
+    <string name="preference_summary_1"></string>
+    <string name="preference_summary_2">删除已缓存的文章内容及图片</string>
+    <string name="preference_summary_3">当前版本号 V1.0</string>
+    <string name="preference_summary_4">https://github.com/lyc-changeworld/MaterialTemplate</string>
+
+</resources>
