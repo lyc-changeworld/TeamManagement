@@ -73,12 +73,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         SharedPreferenceUtil.setCurrentItem(showFragment);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
-        ButterKnife.bind(this);
-    }
+
 
     //重写back按钮的点击事件
     @Override
@@ -177,5 +172,12 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
                 break;
         }
         return mNewsMainFragment;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO: add setContentView(...) invocation
+        ButterKnife.bind(this);
     }
 }

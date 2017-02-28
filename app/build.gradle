@@ -2,6 +2,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
+    //use legacy for android 6.0
+    useLibrary 'org.apache.http.legacy'
+
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
@@ -48,4 +51,8 @@ dependencies {
     //搜索控件
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
     compile files('libs/pinyin4j-2.5.0.jar')
+    //环信资源Optional compile for GCM (Google Cloud Messaging).
+    compile 'com.google.android.gms:play-services-gcm:9.4.0'
+    compile 'com.hyphenate:hyphenate-sdk:3.2.3'
+
 }

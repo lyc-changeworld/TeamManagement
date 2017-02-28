@@ -1,6 +1,15 @@
 <resources>
     <!--1-普通量-->
     <string name="app_name">TeamManagement</string>
+    <string name="warn">提示</string>
+    <string name="warn_to_set_network">网络未连接,请设置网络</string>
+    <string name="set_network">设置网络</string>
+    <string name="temporarily_not_connect_network">暂不联网</string>
+    <string name="warn_bad_consequence_of_not_connect_network">不联网部分功能将无法体验! ! !</string>
+    <string name="whether_or_not_to_exitApp">确定退出应用吗</string>
+    <string name="almost_exitApp">你差点就去了火星</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
 
     <!--2-BottomNavMenu中的菜单项的标题-->
     <string name="bottom_title_0">消息</string>
@@ -14,8 +23,39 @@
     <string name="toolbar_main_title_2">添加朋友</string>
     <string name="toolbar_main_title_3">扫一扫</string>
 
+    <!--4-登录\注册\退出登录-->
+    <string name="username">用户名</string>
+    <string name="password">密码</string>
+    <string name="confirm_password">确认密码</string>
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+    <string name="logout">退出账号</string>
+    <string name="new_user_signUp">新用户注册</string>
+    <string name="forget_password">忘记密码</string>
+    <!--提示语 登录-->
+    <string name="Is_landing">正在登录...</string>
+    <string name="Login_successfully">登录成功</string>
+    <string name="Login_failed">登录失败:</string>
+    <string name="User_not_found">不存在此用户</string>
+    <string name="UserName_or_password_is_wrong">用户id或密码错误</string>
+    <string name="Wait_for_server_response_timeout">等待服务器响应超时</string>
+    <string name="User_login_on_another_device">账户在另外一台设备登录</string>
+    <!--提示语 注册-->
+    <string name="Is_the_registered">正在注册...</string>
+    <string name="Registered_successfully">注册成功</string>
+    <string name="Two_input_password">两次输入的密码不一致，请重新输入！</string>
+    <string name="Registration_failed">注册失败:</string>
+    <string name="User_already_exists">用户已存在！</string>
+    <string name="illegal_user_name">用户名不合法</string>
+    <string name="network_anomalies">网络异常，请检查网络！</string>
+    <string name="registration_failed_without_permission">注册失败，无权限！</string>
+    <!--提示语 登出-->
+    <string name="Are_logged_out">正在退出登录..</string>
+    <string name="Whether_or_not_to_logout">是否选择退出？</string>
+    <string name="Logout_alert">退出当前账号后不会删除任何历史数据，下次登录依然可以使用本账号。</string>
 
-    <!--3-Preference个人喜好相关内容-->
+
+    <!--xxx-Preference个人喜好相关内容-->
     <string name="preference_category_title_0">通用</string>
     <string name="preference_category_title_1">其它说明</string>
     <string name="preference_key_0">save_net_mode</string>

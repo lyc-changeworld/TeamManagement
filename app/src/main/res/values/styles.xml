@@ -9,7 +9,13 @@
 
         <!-- 加入toolbar溢出【弹出】菜单的风格 -->
         <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>
+    </style>
 
+    <style name="MyOverflowText" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#f3672b</item>
+    </style>
+    <style name="MyErrorStyle" >
+        <item name="android:textColor">#ec4722</item>
     </style>
 
     <!--自定义对话框的属性,这里修改了基本控件的颜色属性-->

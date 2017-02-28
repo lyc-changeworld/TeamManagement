@@ -3,9 +3,11 @@ package com.example.achuan.teammanagement.util;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.app.App;
 
 
@@ -76,9 +78,14 @@ public class SystemUtil {
      * 判断当前设备的网络是否打开,并提示是否跳转到网络设置界面
      ***/
     public static void checkAndShowNetSettingDialog(final Context context){
+        final Resources resources=context.getResources();
         if(!isNetworkConnected()){
-            DialogUtil.createOrdinaryDialog(context,"提示","网络未连接,请设置网络",
-                    "设置网络", "暂不联网",false,//无法取消对话框(警示)
+            DialogUtil.createOrdinaryDialog(context,
+                    resources.getString(R.string.warn),
+                    resources.getString(R.string.warn_to_set_network),
+                    resources.getString(R.string.set_network),
+                    resources.getString(R.string.temporarily_not_connect_network),
+                    false,//设置为无法取消对话框(警示)
                     new DialogUtil.OnAlertDialogButtonClickListener() {
                         @Override
                         public void onRightButtonClick() {
@@ -100,7 +107,9 @@ public class SystemUtil {
                         public void onLeftButtonClick() {
                             TastyToastUtil.warning_long(
                                     context,
-                                    "不联网部分功能将无法体验! ! !");
+                                    resources.getString(
+                                            R.string.warn_bad_consequence_of_not_connect_network
+                                    ));
                         }
                     });
         }
@@ -109,8 +118,13 @@ public class SystemUtil {
      * 弹出对话框,确认是否退出App
      ***/
     public static void showExitDialog(final Context context) {
+        final Resources resources=context.getResources();
         DialogUtil.createOrdinaryDialog(context,
-                "提示", "确定退出应用吗", "确定", "取消",true,//可以取消对话框(信息)
+                resources.getString(R.string.warn),
+                resources.getString(R.string.whether_or_not_to_exitApp),
+                resources.getString(R.string.confirm),
+                resources.getString(R.string.cancel),
+                true,//可以取消对话框(信息)
                 new DialogUtil.OnAlertDialogButtonClickListener() {
                     @Override
                     public void onRightButtonClick() {
@@ -122,7 +136,7 @@ public class SystemUtil {
                     public void onLeftButtonClick() {
                         TastyToastUtil.info_short(
                                 context,
-                                "你差点就去了火星");
+                                resources.getString(R.string.almost_exitApp));
                     }
                 });
     }

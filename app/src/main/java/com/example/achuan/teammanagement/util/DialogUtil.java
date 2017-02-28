@@ -20,7 +20,7 @@ import java.util.Calendar;
  */
 public class DialogUtil {
 
-    public static ProgressDialog sProgressDialog;
+    private static ProgressDialog sProgressDialog;
 
     //普通窗口的接口
     public interface OnAlertDialogButtonClickListener {
@@ -74,18 +74,24 @@ public class DialogUtil {
         dialog.show();//将对话框显示出来
     }
 
-    /***2-创建一个耗时等待的对话框***/
-    public static void createProgressDialog(Context context,String title,
-                                            String message){
+    /***2-进度加载对话框***/
+    /*创建一个耗时等待的对话框*/
+    public static void createProgressDialog(Context context, String title, String message,
+                                            boolean isCancelable,boolean isTouchOutCancel){
         sProgressDialog=new ProgressDialog(context);
         sProgressDialog.setTitle(title);
         sProgressDialog.setMessage(message);
-        sProgressDialog.setCancelable(true);//对话框可以通过Back键取消掉
+        sProgressDialog.setCancelable(isCancelable);//对话框可以通过Back键取消掉 默认为true
+        sProgressDialog.setCanceledOnTouchOutside(isTouchOutCancel);//触摸框外区域可以取消对话框 默认为true
         sProgressDialog.show();
         /*//加载完后执行关闭对话框的方法
                 progressDialog.dismiss();*/
     }
-    /***3-关闭耗时加载对话框***/
+    /*检查进度框是否还在显示*/
+    public static boolean isProgressDialogShowing(){
+        return sProgressDialog.isShowing();
+    }
+    /*关闭耗时加载对话框*/
     public static void closeProgressDialog(){
         sProgressDialog.dismiss();
     }
