@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--功能：列表中item间的分割线效果-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle" >
+    <!--颜色-->
+    <solid android:color="@color/itemDivider" />
+    <!--分割线的高度-->
+    <size android:height="0.5dp" />
+</shape>

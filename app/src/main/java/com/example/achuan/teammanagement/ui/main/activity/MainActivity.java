@@ -2,6 +2,7 @@ package com.example.achuan.teammanagement.ui.main.activity;
 
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -13,12 +14,20 @@ import android.widget.Toast;
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleActivity;
+import com.example.achuan.teammanagement.model.db.ContactUser;
+import com.example.achuan.teammanagement.model.db.DBManager;
+import com.example.achuan.teammanagement.model.db.InviteMessage;
 import com.example.achuan.teammanagement.ui.contacts.fragment.ContactsMainFragment;
 import com.example.achuan.teammanagement.ui.explore.fragment.ExploreMainFragment;
 import com.example.achuan.teammanagement.ui.myself.fragment.MyselfMainFragment;
 import com.example.achuan.teammanagement.ui.news.fragment.NewsMainFragment;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.example.achuan.teammanagement.util.SystemUtil;
+import com.hyphenate.EMContactListener;
+import com.hyphenate.chat.EMClient;
+
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,6 +80,141 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         //并将第一界面碎片添加到布局容器中
         replaceFragment(contentViewId, getTargetFragment(showFragment));
         SharedPreferenceUtil.setCurrentItem(showFragment);
+        /***3-注册联系人变动监听***/
+        EMClient.getInstance().contactManager().setContactListener(new MyContactListener());
+    }
+
+    /***
+     * 自定义好友变化listener类
+     */
+    public class MyContactListener implements EMContactListener{
+        @Override
+        public void onContactAdded(final String username) {
+            //增加了联系人时回调此方法
+            /*---保存增加的联系人---*/
+            //获取本地联系人数据
+            Map<String, ContactUser> localUsers = DBManager.getContactList();
+            // 添加好友时可能会回调added方法两次
+            if (!localUsers.containsKey(username)) {
+                //Map<String, ContactUser> toAddUsers = new HashMap<String, ContactUser>();
+                //创建实例对象
+                ContactUser user = new ContactUser();
+                user.setUserName(username);
+                //进行查询操作,避免重复添加
+                DBManager.saveContact(user);
+                //toAddUsers.put(username, user);//当前需要添加的联系人的数据
+                //localUsers.putAll(toAddUsers);//全部归属到本地联系人集合中
+            }
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),
+                            "增加联系人：+"+username,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        @Override
+        public void onContactDeleted(final String username) {
+            //被删除时回调此方法
+            /*//获取本地联系人数据
+            Map<String, ContactUser> localUsers = DBManager.getContactList();
+            // 本地保护此用户才执行删除操作
+            if (localUsers.containsKey(username)) {
+                //从本地数据库中删除
+                DBManager.deleteContact(username);
+            }
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),
+                            "删除联系人：+"+username,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });*/
+        }
+        @Override
+        public void onContactInvited(final String username, String reason) {
+            //收到邀请
+
+            // 接到邀请的消息，如果不处理(同意或拒绝)，掉线后，服务器会自动再发过来，所以客户端不需要重复提醒
+            List<InviteMessage> msgs = DBManager.getMessagesList();
+
+            for (InviteMessage inviteMessage : msgs) {
+                //如果之前发的消息不是群邀请(好友邀请)且发起人名和当前发起人名相同,就把历史消息删除掉
+                /*当前是无群聊的情况,后面引入群聊后还需进行大量优化*/
+                if (inviteMessage.getGroupId() == null && inviteMessage.getFrom().equals(username)) {
+                    DBManager.deleteMessage(username);
+                }
+            }
+
+            //自己封装的javabean
+            InviteMessage msg = new InviteMessage();
+            msg.setFrom(username);
+            msg.setTime(System.currentTimeMillis());
+            msg.setReason(reason);
+            // 设置相应status对应的序数
+            msg.setStatusOrdinal(InviteMessage.InviteMesageStatus.BEINVITEED.ordinal());
+            notifyNewIviteMessage(msg);
+
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "收到好友申请：+"+username,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        @Override
+        public void onFriendRequestAccepted(final String username) {
+            //好友请求被同意
+            List<InviteMessage> msgs = DBManager.getMessagesList();
+
+            /***---注意：下面的逻辑有待改善！！！-***/
+            for (InviteMessage inviteMessage : msgs) {
+                if (inviteMessage.getFrom().equals(username)) {
+                    return;
+                }
+            }
+
+            // 自己封装的javabean
+            InviteMessage msg = new InviteMessage();
+            msg.setFrom(username);
+            msg.setTime(System.currentTimeMillis());
+            msg.setStatusOrdinal(InviteMessage.InviteMesageStatus.BEAGREED.ordinal());
+            //存储同意的消息
+            notifyNewIviteMessage(msg);
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),
+                            "好友申请同意：+"+username, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        @Override
+        public void onFriendRequestDeclined(String username) {
+            //好友请求被拒绝
+            // 参考同意，被邀请实现此功能,demo未实现
+            //Log.d(username, username + "拒绝了你的好友请求");
+        }
+    }
+
+    /**
+     * 保存并提示消息的邀请消息
+     * @param msg
+     */
+    private void notifyNewIviteMessage(InviteMessage msg){
+        /*if(inviteMessgeDao == null){
+            inviteMessgeDao = new InviteMessgeDao(MainActivity.this);
+        }
+        inviteMessgeDao.saveMessage(msg);
+        //保存未读数，这里没有精确计算
+        inviteMessgeDao.saveUnreadMessageCount(1);
+        // 提示有新消息
+        //响铃或其他操作*/
+        DBManager.saveMessage(msg);
+
     }
 
 
@@ -98,6 +242,8 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
             case R.id.search:
                 break;
             case R.id.add_person:
+                Intent intent=new Intent(this,AddContactActivity.class);
+                startActivity(intent);
                 Toast.makeText(this, "添加朋友", Toast.LENGTH_SHORT).show();
                 break;
             default:break;

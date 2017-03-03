@@ -17,6 +17,7 @@
 
     <color name="btn_logout_normal">#d33f3f</color>
     <color name="btn_logout_pressed">#DA5A4D</color>
+    <color name="btn_gray_normal">#c0c0c0</color>
 
 
 

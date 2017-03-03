@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+    <!--1.4.0版本后支持多数据库文件的操作,这里添加的是默认配置-->
+
+    <!--定义数据库的名称-这里用EM作为后缀代表该数据库是环信通讯的数据库文件-->
+    <dbname value="default_EM" />
+    <!--定义数据库版本号-->
+    <version value="1" />
+    <!--
+        Define your models in the list with mapping tag, LitePal will
+        create tables for each mapping class. The supported fields
+        defined in models will be mapped into columns.
+        For example:
+        <list>
+            <mapping class="com.test.model.Reader" />
+            <mapping class="com.test.model.Magazine" />
+        </list>
+    -->
+    <list>
+        <mapping class="com.example.achuan.teammanagement.model.db.ContactUser" />
+        <mapping class="com.example.achuan.teammanagement.model.db.InviteMessage" />
+    </list>
+
+    <!--
+        按下面方式配置,将会使数据库文件存放在:
+        /sdcard/Android/data/<package name>/files/databases目录下,
+        注意:此功能尽量只在调试的时候使用，把数据库文件存放在SD卡真的很不安全
+        <storage value="external" />
+    -->
+</litepal>

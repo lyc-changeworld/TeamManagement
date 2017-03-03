@@ -10,6 +10,8 @@ import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
 
+import org.litepal.LitePal;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +43,8 @@ public class App  extends Application {
         super.onCreate();
         instance = this;
         sContext=getApplicationContext();//获得一个应用程序级别的Context
+        /*---Litepal数据库初始化---*/
+        LitePal.initialize(this);
         /***环信-初始化SDK***/
         initHyphenate(sContext);
     }

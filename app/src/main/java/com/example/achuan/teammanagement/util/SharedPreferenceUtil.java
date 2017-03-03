@@ -25,13 +25,21 @@ public class SharedPreferenceUtil {
         return App.getInstance().getSharedPreferences(
                 Constants.PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
-    /****2-定义get和set方法,实现对SharedPreferences文件中属性值的读取和修改****/
-    //当前显示对应的item的布局
+
+    /***定义get和set方法,实现对SharedPreferences文件中属性值的读取和修改***/
+    //2-当前显示对应的item的布局
     public static int getCurrentItem() {
-        return getAppSp().getInt(Constants.SP_CURRENT_ITEM, DEFAULT_CURRENT_ITEM);
+        return getAppSp().getInt(Constants.CURRENT_ITEM, DEFAULT_CURRENT_ITEM);
     }
     public static void setCurrentItem(int item) {
-        getAppSp().edit().putInt(Constants.SP_CURRENT_ITEM, item).commit();
+        getAppSp().edit().putInt(Constants.CURRENT_ITEM, item).commit();
+    }
+    //3-当前环信用户信息
+    public static String getCurrentUserName() {
+        return getAppSp().getString(Constants.KEY_USERNAME,null);
+    }
+    public static void setCurrentUserName(String username) {
+        getAppSp().edit().putString(Constants.KEY_USERNAME, username).commit();
     }
 
 

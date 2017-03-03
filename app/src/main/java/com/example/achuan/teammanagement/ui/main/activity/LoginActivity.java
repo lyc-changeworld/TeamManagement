@@ -15,9 +15,13 @@ import android.widget.Toast;
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleActivity;
 import com.example.achuan.teammanagement.util.DialogUtil;
+import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
+
+import org.litepal.LitePal;
+import org.litepal.LitePalDB;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -125,9 +129,7 @@ public class LoginActivity extends SimpleActivity {
                 getString(R.string.Is_landing),
                 false,false);//对话框无法被取消
         // close it before login to make sure DemoDB not overlap
-        //DemoDBManager.getInstance().closeDB();
-        // reset current user name before login
-        //DemoApplication.getInstance().setCurrentUserName(currentUsername);
+        //DBManager.getInstance().closeDB();
         // 调用sdk登陆方法登陆聊天服务器
         /*执行登录操作,成功后还需执行两个load方法,保证进入主页面后本地会话和群组都 load 完毕*/
         //开启子线程进行登录操作
@@ -146,11 +148,22 @@ public class LoginActivity extends SimpleActivity {
                                 if (!LoginActivity.this.isFinishing() && DialogUtil.isProgressDialogShowing()) {
                                     DialogUtil.closeProgressDialog();
                                 }
+
+
+                                /*---登录成功后更新当前用户信息---*/
+                                SharedPreferenceUtil.setCurrentUserName(userName);
+                                /***---切换数据库文件到当前对应的用户---***/
+                                /*创建一个名为xxx的数据库,而它的所有配置都会直接使用litepal.xml文件中配置的内容*/
+                                LitePalDB litePalDB=LitePalDB.fromDefault(userName+"_EM");
+                                LitePal.use(litePalDB);
+                                //切换回litepal.xml中指定的默认数据库
+                                //LitePal.useDefault();
+
+
                                 //提示登录成功
                                 Toast.makeText(getApplicationContext(),
                                         getString(R.string.Login_successfully),
                                         Toast.LENGTH_SHORT).show();
-
                                 // ** 第一次登录或者之前logout后再登录,加载所有本地群和回话
                                 // ** manually load all local groups and
                                 EMClient.getInstance().groupManager().loadAllGroups();
