@@ -13,12 +13,11 @@ import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleFragment;
 import com.example.achuan.teammanagement.model.db.ContactUser;
 import com.example.achuan.teammanagement.model.db.DBManager;
+import com.example.achuan.teammanagement.ui.contacts.activity.NewFriendsMsgActivity;
 import com.example.achuan.teammanagement.ui.contacts.adapter.ContactAdapter;
-import com.example.achuan.teammanagement.ui.main.activity.NewFriendsMsgActivity;
-import com.example.achuan.teammanagement.util.SystemUtil;
+import com.example.achuan.teammanagement.ui.news.activity.ChatActivity;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
 import com.hyphenate.chat.EMClient;
-import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,13 +36,15 @@ import butterknife.ButterKnife;
 public class ContactsMainFragment extends SimpleFragment {
 
 
+    @BindView(R.id.rv)
+    RecyclerView mRv;
+
     Context mContext;//上下文操作对象
     ContactAdapter mContactAdapter;//适配器
     Map<String, ContactUser> contactsMap;//指向本地联系人集合
     List<ContactUser> mContactUserList;//真正显示在列表中的联系人集合
 
-    @BindView(R.id.rv)
-    RecyclerView mRv;
+
 
     @Override
     protected int getLayoutId() {
@@ -61,36 +62,10 @@ public class ContactsMainFragment extends SimpleFragment {
         top.setUserName(getString(R.string.new_friends_msg));
         mContactUserList.add(top);//添加顶上的那个数据栏
 
-
-
         //获取本地联系人数据
         Map<String, ContactUser> localUsers = DBManager.getContactList();
         Collection values = localUsers.values();//获取Map集合的value集合
         mContactUserList.addAll(values);
-        //如果有网,则与网络端的联系人同步,否则只加载本地联系人
-        if(SystemUtil.isNetworkConnected()){
-            try {
-                //获取好友的 username list,开发者需要根据 username 去自己服务器获取好友的详情
-                List<String> usernames = EMClient.getInstance().contactManager().
-                        getAllContactsFromServer();
-                for(String userName:usernames){
-                    // 本地不包含此用户才执行添加操作
-                    if (!localUsers.containsKey(userName)) {
-                        ContactUser user=new ContactUser();
-                        user.setUserName(userName);
-                        //保存用户人到数据库
-                        DBManager.saveContact(user);
-                        mContactUserList.add(user);
-                    }
-                }
-                /*//本地包含但网络端不包含的,就从本地删除掉,这个逻辑比较复杂,后续再实现
-                if(){
-                    DBManager.deleteContact(userName);
-                }*/
-            } catch (HyphenateException e) {
-                e.printStackTrace();
-            }
-        }
         //getContactList();
 
         /*2-*/
@@ -114,7 +89,11 @@ public class ContactsMainFragment extends SimpleFragment {
                     startActivity(intent);
                 }else {
                     //点击联系人跳转到对应人的聊天界面
-
+                    Intent intent=new Intent(mContext,ChatActivity.class);
+                    //发送联系人的名称到聊天界面
+                    intent.putExtra("username",
+                            mContactUserList.get(postion).getUserName());
+                    startActivity(intent);
                 }
             }
         });

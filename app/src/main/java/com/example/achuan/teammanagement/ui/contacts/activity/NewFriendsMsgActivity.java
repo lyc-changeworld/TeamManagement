@@ -1,4 +1,4 @@
-package com.example.achuan.teammanagement.ui.main.activity;
+package com.example.achuan.teammanagement.ui.contacts.activity;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;

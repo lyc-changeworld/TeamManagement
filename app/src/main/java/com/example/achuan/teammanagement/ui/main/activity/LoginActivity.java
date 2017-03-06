@@ -14,14 +14,22 @@ import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleActivity;
+import com.example.achuan.teammanagement.model.db.ContactUser;
+import com.example.achuan.teammanagement.model.db.DBManager;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
 
 import org.litepal.LitePal;
 import org.litepal.LitePalDB;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -128,8 +136,6 @@ public class LoginActivity extends SimpleActivity {
         DialogUtil.createProgressDialog(this,null,
                 getString(R.string.Is_landing),
                 false,false);//对话框无法被取消
-        // close it before login to make sure DemoDB not overlap
-        //DBManager.getInstance().closeDB();
         // 调用sdk登陆方法登陆聊天服务器
         /*执行登录操作,成功后还需执行两个load方法,保证进入主页面后本地会话和群组都 load 完毕*/
         //开启子线程进行登录操作
@@ -149,7 +155,6 @@ public class LoginActivity extends SimpleActivity {
                                     DialogUtil.closeProgressDialog();
                                 }
 
-
                                 /*---登录成功后更新当前用户信息---*/
                                 SharedPreferenceUtil.setCurrentUserName(userName);
                                 /***---切换数据库文件到当前对应的用户---***/
@@ -168,7 +173,7 @@ public class LoginActivity extends SimpleActivity {
                                 // ** manually load all local groups and
                                 EMClient.getInstance().groupManager().loadAllGroups();
                                 EMClient.getInstance().chatManager().loadAllConversations();
-                                //getFriends();//加载好友信息
+                                getFriends();//加载好友信息
                                 //跳转到主页面
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
@@ -224,6 +229,26 @@ public class LoginActivity extends SimpleActivity {
             }
         }).start();
     }
+
+    /*获取好友列表,并存储到本地数据库中*/
+    private  void  getFriends(){
+        try {
+            //获取网络端的所有好友列表
+            List<String> usernames = EMClient.getInstance().contactManager().
+                    getAllContactsFromServer();
+            Map<String ,ContactUser> users=new HashMap<String ,ContactUser>();
+            for(String username:usernames){
+                ContactUser user=new ContactUser();
+                user.setUserName(username);
+                users.put(username, user);
+            }
+            //保存联系人到本地数据库
+            DBManager.saveContactList(new ArrayList<ContactUser>(users.values()));
+        } catch (HyphenateException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

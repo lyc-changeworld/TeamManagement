@@ -2,7 +2,6 @@ package com.example.achuan.teammanagement.ui.news.fragment;
 
 
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,8 +22,6 @@ public class NewsMainFragment extends SimpleFragment {
 
     @BindView(R.id.rv)
     RecyclerView mRv;
-    @BindView(R.id.sw_rf)
-    SwipeRefreshLayout mSwRf;
 
     @Override
     protected int getLayoutId() {
@@ -33,9 +30,6 @@ public class NewsMainFragment extends SimpleFragment {
 
     @Override
     protected void initEventAndData() {
-
-
-
 
 
 

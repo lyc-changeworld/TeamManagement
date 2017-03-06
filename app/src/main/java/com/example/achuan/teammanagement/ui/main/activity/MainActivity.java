@@ -32,6 +32,8 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.achuan.teammanagement.model.db.DBManager.deleteMessage;
+
 public class MainActivity extends SimpleActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     //需要装载到主活动中的Fragment的引用变量
@@ -53,6 +55,8 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
     BottomNavigationView mBtmNav;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+
+    EMContactListener mEMContactListener;
 
 
     @Override
@@ -81,7 +85,8 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         replaceFragment(contentViewId, getTargetFragment(showFragment));
         SharedPreferenceUtil.setCurrentItem(showFragment);
         /***3-注册联系人变动监听***/
-        EMClient.getInstance().contactManager().setContactListener(new MyContactListener());
+        mEMContactListener=new MyContactListener();
+        EMClient.getInstance().contactManager().setContactListener(mEMContactListener);
     }
 
     /***
@@ -96,14 +101,11 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
             Map<String, ContactUser> localUsers = DBManager.getContactList();
             // 添加好友时可能会回调added方法两次
             if (!localUsers.containsKey(username)) {
-                //Map<String, ContactUser> toAddUsers = new HashMap<String, ContactUser>();
                 //创建实例对象
                 ContactUser user = new ContactUser();
                 user.setUserName(username);
                 //进行查询操作,避免重复添加
                 DBManager.saveContact(user);
-                //toAddUsers.put(username, user);//当前需要添加的联系人的数据
-                //localUsers.putAll(toAddUsers);//全部归属到本地联系人集合中
             }
             runOnUiThread(new Runnable(){
                 @Override
@@ -117,21 +119,20 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         @Override
         public void onContactDeleted(final String username) {
             //被删除时回调此方法
-            /*//获取本地联系人数据
+            //获取本地联系人数据
             Map<String, ContactUser> localUsers = DBManager.getContactList();
-            // 本地保护此用户才执行删除操作
+            // 本地包含此用户才执行删除操作
             if (localUsers.containsKey(username)) {
                 //从本地数据库中删除
                 DBManager.deleteContact(username);
+                DBManager.deleteMessage(username);
             }
             runOnUiThread(new Runnable(){
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(),
-                            "删除联系人：+"+username,
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "删除联系人：+"+username, Toast.LENGTH_SHORT).show();
                 }
-            });*/
+            });
         }
         @Override
         public void onContactInvited(final String username, String reason) {
@@ -144,7 +145,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
                 //如果之前发的消息不是群邀请(好友邀请)且发起人名和当前发起人名相同,就把历史消息删除掉
                 /*当前是无群聊的情况,后面引入群聊后还需进行大量优化*/
                 if (inviteMessage.getGroupId() == null && inviteMessage.getFrom().equals(username)) {
-                    DBManager.deleteMessage(username);
+                    deleteMessage(username);
                 }
             }
 
@@ -200,6 +201,15 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         }
     }
 
+    /***
+     * 在活动销毁时移除联系人监听器
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EMClient.getInstance().contactManager().removeContactListener(mEMContactListener);
+    }
+
     /**
      * 保存并提示消息的邀请消息
      * @param msg
@@ -224,7 +234,6 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
     public void onBackPressed() {
         SystemUtil.showExitDialog(this);
     }
-
 
     /*-----为工具栏创建菜单选项按钮-----*/
     @Override

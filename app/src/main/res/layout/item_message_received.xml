@@ -6,7 +6,7 @@
     android:paddingTop="13dp" >
 
     <TextView
-        android:id="@+id/timestamp"
+        android:id="@+id/tv_timestamp"
         android:visibility="gone"
         style="@style/chat_text_date_style"
         android:layout_width="wrap_content"
@@ -29,8 +29,8 @@
             android:scaleType="fitXY" />
 
        <TextView
+           android:id="@+id/tv_chatcontent"
              android:maxWidth="225.0dip"
-            android:id="@+id/tv_chatcontent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/margin_chat_activity"

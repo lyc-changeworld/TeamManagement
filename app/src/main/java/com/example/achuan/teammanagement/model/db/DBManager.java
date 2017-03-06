@@ -14,9 +14,9 @@ import java.util.Map;
 
 public class DBManager {
 
-    /*--------------------------邀请消息相关--------------------------*/
+    /*--------------------------1-邀请消息相关--------------------------*/
     /**
-     * 1-保存message到本地数据库
+     * 保存message到本地数据库
      * @param message
      * @return  返回这条messaged在db中的id
      */
@@ -38,7 +38,7 @@ public class DBManager {
     }
 
     /**
-     * 2-从本地数据库获取全部的messges
+     * 从本地数据库获取全部的messges
      * @return InviteMessage集合数据
      */
     public static List<InviteMessage> getMessagesList(){
@@ -49,7 +49,7 @@ public class DBManager {
     }
 
     /**
-     * 3-更新message的状态(根据消息的id号进行更新)
+     * 更新message的状态(根据消息的id号进行更新)
      * @param msgId,mesageStatus
      */
     public static void updateMessage(int msgId,int ordinal){
@@ -59,17 +59,16 @@ public class DBManager {
     }
 
     /**
-     * 4-删除要求消息(根据消息发起人名称进行删除)
+     * 删除要求消息(根据消息发起人名称进行删除)
      * @param from
      */
     public static void deleteMessage(String from){
         DataSupport.deleteAll(InviteMessage.class,"from=?",from);
     }
 
-    /*--------------------------联系人相关--------------------------*/
-
+    /*--------------------------2-联系人相关--------------------------*/
     /**
-     * 5-保存一个联系人
+     * 保存一个联系人
      * @param user
      */
     public static void saveContact(ContactUser user){
@@ -83,10 +82,12 @@ public class DBManager {
     }
 
     /**
-     * 6-保存好友list
+     * 保存好友list （先清空表格,后重新存储联系人数据）
      * @param contactList
      */
     public static void saveContactList(List<ContactUser> contactList) {
+        //存储联系人之前清空联系人表
+        DataSupport.deleteAll(ContactUser.class);
         //轮询存储用户人
         for (ContactUser contactUser:contactList){
             ContactUser user=new ContactUser();
@@ -101,7 +102,7 @@ public class DBManager {
     }
 
     /**
-     * 7-获取好友list
+     * 获取好友list
      * @return Map<String, ContactUser>
      */
     public static Map<String, ContactUser> getContactList() {
@@ -110,7 +111,7 @@ public class DBManager {
         /*---查询表格中的所有数据---*/
         List<ContactUser> contactUsers = new ArrayList<ContactUser>();
         contactUsers= DataSupport.findAll(ContactUser.class);
-        //轮询存储数据
+        //轮询查询数据
         for (ContactUser user:contactUsers){
             users.put(user.getUserName(),user);
         }
@@ -118,7 +119,7 @@ public class DBManager {
     }
 
     /**
-     * 8-删除一个联系人
+     * 删除一个联系人
      * @param username
      */
     public static void deleteContact(String username){
