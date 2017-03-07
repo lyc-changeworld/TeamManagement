@@ -1,53 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="59dp"
-     android:id="@+id/list_itease_layout"
-     android:background="#fff"
-    android:gravity="center_vertical" >
+    android:background="@drawable/item_selector"
+    android:gravity="center_vertical">
 
+    <!--头像区域-->
     <RelativeLayout
-        android:id="@+id/avatar_container"
+        android:id="@+id/rl_avatar_container"
         android:layout_width="59dp"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true" >
-
-      <ImageView
-            android:id="@+id/avatar"
+        <ImageView
+            android:id="@+id/iv_avatar"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             android:scaleType="fitXY"
             android:src="@drawable/default_avatar" />
-
         <TextView
-            android:id="@+id/unread_msg_number"
+            android:id="@+id/tv_unread_msg_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="2dp"
             android:layout_marginTop="3dp"
-            android:background="@drawable/ease_unread_count_bg"
+            android:background="@drawable/em_unread_count_bg"
             android:gravity="center"
             android:text="7"
             android:textColor="@android:color/white"
             android:textSize="12sp" />
     </RelativeLayout>
 
+    <!--用户名-->
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/tv_name"
         android:text="testdata"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="7dp"
         android:layout_marginTop="6dp"
-        android:layout_toRightOf="@id/avatar_container"
+        android:layout_toRightOf="@id/rl_avatar_container"
         android:textColor="#000"
         android:textSize="16sp" />
-
+    <!--最新更新的消息的时间-->
     <TextView
-        android:id="@+id/time"
+        android:id="@+id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -55,26 +55,25 @@
         android:layout_marginTop="6dp"
         android:textColor="#999999"
         android:textSize="13sp" />
-
+    <!--消息的状态-->
     <ImageView
-        android:id="@+id/msg_state"
+        android:id="@+id/tv_msg_state"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="7dp"
-        android:layout_toRightOf="@id/avatar_container"
+        android:layout_toRightOf="@id/rl_avatar_container"
         android:src="@drawable/ease_msg_state_fail_resend"
         android:visibility="gone" />
-
+    <!--最新的一条消息的内容-->
     <TextView
-        android:id="@+id/message"
-        android:layout_toLeftOf="@id/time"
+        android:id="@+id/tv_message"
+        android:layout_toLeftOf="@id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@id/msg_state"
-        android:singleLine="true"
+        android:layout_toRightOf="@id/tv_msg_state"
         android:ellipsize="end"
         android:padding="7dp"
         android:textColor="#999999"

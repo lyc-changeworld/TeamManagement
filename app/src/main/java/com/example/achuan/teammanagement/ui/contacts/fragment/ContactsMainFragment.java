@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.achuan.teammanagement.R;
+import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleFragment;
 import com.example.achuan.teammanagement.model.db.ContactUser;
 import com.example.achuan.teammanagement.model.db.DBManager;
@@ -91,7 +92,7 @@ public class ContactsMainFragment extends SimpleFragment {
                     //点击联系人跳转到对应人的聊天界面
                     Intent intent=new Intent(mContext,ChatActivity.class);
                     //发送联系人的名称到聊天界面
-                    intent.putExtra("username",
+                    intent.putExtra(Constants.EXTRA_USER_ID,
                             mContactUserList.get(postion).getUserName());
                     startActivity(intent);
                 }

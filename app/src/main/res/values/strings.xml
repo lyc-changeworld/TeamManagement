@@ -75,10 +75,13 @@
     <string name="Agree_with_failure">同意失败:</string>
     <string name="Refuse_with_failure">拒绝失败:</string>
 
+    <!--消息列表界面-->
+    <string name="Cant_chat_with_yourself">不能和自己聊天</string>
 
     <!---聊天界面-->
     <string name="text_ack_msg">已读</string>
     <string name="text_delivered_msg">送达</string>
+
 
 
 

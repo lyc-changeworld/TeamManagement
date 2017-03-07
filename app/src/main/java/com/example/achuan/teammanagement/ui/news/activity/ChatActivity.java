@@ -64,6 +64,7 @@ public class ChatActivity extends SimpleActivity {
     LinearLayoutManager linearlayoutManager;
     ChatMessageAdapter mChatMessageAdapter;
 
+
     @Override
     protected int getLayout() {
         return R.layout.activity_chat;
@@ -72,7 +73,7 @@ public class ChatActivity extends SimpleActivity {
     @Override
     protected void initEventAndData() {
         /*1-获取到当前聊天的联系人的名称*/
-        toChatUsername = this.getIntent().getStringExtra("username");
+        toChatUsername = this.getIntent().getStringExtra(Constants.EXTRA_USER_ID);
         //设置标题工具栏
         setToolBar(mToolbar, toChatUsername, true);
         /***2-为Edit输入框添加输入监听类,实现合理的效果***/
@@ -123,30 +124,38 @@ public class ChatActivity extends SimpleActivity {
 
         List<EMMessage> msgs = mEMConversation.getAllMessages();//当前会话的消息集合
 
-        //获取最顶上的msg的id号
-        String msgId=msgs.get(0).getMsgId();
-
         int msgAllCount=mEMConversation.getAllMsgCount();//全部消息的个数
         int msgCurrentCount = msgs != null ? msgs.size() : 0;//当前消息的个数
-        List<EMMessage> moreMessages=null;
+        List<EMMessage> moreMessages=null;//存储加载出来的更多消息
+        String msgId = null;//获取最顶上的msg的id号
 
-        if((msgAllCount-msgCurrentCount)>=pageMore){
-            //如果剩下消息数大于pageMore
-            //从最上面的消息位置开始,加载剩下数量的消息到本地对象来
-            moreMessages=mEMConversation.loadMoreMsgFromDB(msgId, pageMore);
-        }else if((msgAllCount-msgCurrentCount)>0){
-            //加载完全部剩下的消息
-            moreMessages=mEMConversation.loadMoreMsgFromDB(msgId,msgAllCount-msgCurrentCount );
+        if(msgCurrentCount>0){
+            msgId=msgs.get(0).getMsgId();
+            //去服务器加载消息出来
+            if((msgAllCount-msgCurrentCount)>=pageMore){
+                //如果剩下消息数大于pageMore
+                //从最上面的消息位置开始,加载剩下数量的消息到本地对象来
+                moreMessages=mEMConversation.loadMoreMsgFromDB(msgId, pageMore);
+            }else if((msgAllCount-msgCurrentCount)>0){
+                //剩余消息不到pageMore条,加载获取剩下的全部消息
+                moreMessages=mEMConversation.loadMoreMsgFromDB(msgId,msgAllCount-msgCurrentCount );
+                Toast.makeText(this, "最后几条消息了...",
+                        Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(this, "没有更多消息了...",
+                        Toast.LENGTH_SHORT).show();
+            }
+            /*将加载出来的消息添加显示到列表中*/
+            if(moreMessages!=null){
+                //添加消息到集合的首部
+                mEMMessageList.addAll(0,moreMessages);
+                mChatMessageAdapter.notifyDataSetChanged();//刷新列表
+                linearlayoutManager.scrollToPosition(0);
+            }
         }else {
-            Toast.makeText(this, "没有更多消息了...",
+            //当前会话界面没有消息,说明消息记录被全部删除了,此时msgAllCount=msgCurrentCount=0;
+            Toast.makeText(this, "没有任何消息记录...",
                     Toast.LENGTH_SHORT).show();
-        }
-
-        if(moreMessages!=null){
-            //添加消息到集合的首部
-            mEMMessageList.addAll(0,moreMessages);
-            mChatMessageAdapter.notifyDataSetChanged();//刷新列表
-            linearlayoutManager.scrollToPosition(0);
         }
         //关闭刷新动画条
         if(mSwRf.isRefreshing()){
@@ -157,44 +166,53 @@ public class ChatActivity extends SimpleActivity {
 
     EMMessageListener mEMMessageListener = new EMMessageListener() {
         @Override
-        public void onMessageReceived(List<EMMessage> messages) {
-            // 收到消息
-            for (EMMessage message : messages) {
-                String username = null;
-                // 群组消息
-                if (message.getChatType() == EMMessage.ChatType.GroupChat ||
-                        message.getChatType() == EMMessage.ChatType.ChatRoom) {
-                    username = message.getTo();
-                } else {
-                    // 单聊消息
-                    username = message.getFrom();
-                }
-                // 如果是当前会话的消息，刷新聊天页面
-                if (username.equals(toChatUsername)) {
-                    mEMMessageList.addAll(messages);
-                    mChatMessageAdapter.notifyDataSetChanged();
+        public void onMessageReceived(final List<EMMessage> messages) {
+            //LogUtil.d("aaaaaaaaaa","收到消息");
+            /*回到主线程来进行UI更新,否则不会自动更新列表(需要碰一下列表)*/
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // 收到消息
+                    for (EMMessage message : messages) {
+                        String username = null;
+                        // 群组消息
+                        if (message.getChatType() == EMMessage.ChatType.GroupChat ||
+                                message.getChatType() == EMMessage.ChatType.ChatRoom) {
+                            username = message.getTo();
+                        } else {
+                            // 单聊消息
+                            username = message.getFrom();
+                        }
+                        // 如果是当前会话的消息，刷新聊天页面
+                        if (username.equals(toChatUsername)) {
+                            mEMMessageList.add(message);
+                            mChatMessageAdapter.notifyDataSetChanged();
+                            //mChatMessageAdapter.notifyItemInserted(mEMMessageList.size()-1);
+                            /***
+                             * 记得把别人发送过来并且显示了的消息置为已读
+                             * ***/
+                            mEMConversation.markMessageAsRead(message.getMsgId());
+                        }
+                    }
+                    //调整焦点的位置
                     if (mEMMessageList.size() > 0) {
-                        linearlayoutManager.scrollToPosition(mChatMessageAdapter.getItemCount() - 1);
+                        linearlayoutManager.scrollToPosition(mEMMessageList.size() - 1);
                     }
                 }
-            }
+            });
         }
 
         @Override//收到透传消息
         public void onCmdMessageReceived(List<EMMessage> messages) {
 
         }
-
         @Override//收到已读回执
         public void onMessageRead(List<EMMessage> messages) {
-
         }
-
         @Override//收到已送达回执
         public void onMessageDelivered(List<EMMessage> messages) {
 
         }
-
         @Override//消息状态变动
         public void onMessageChanged(EMMessage message, Object change) {
 
@@ -208,22 +226,35 @@ public class ChatActivity extends SimpleActivity {
         String content = mEtContent.getText().toString().trim();
 
         // 创建一条文本消息，content为消息文字内容，toChatUsername为对方用户或者群聊的id，后文皆是如此
-        EMMessage message = EMMessage.createTxtSendMessage(content, toChatUsername);
+        final EMMessage message = EMMessage.createTxtSendMessage(content, toChatUsername);
         // 如果是群聊，设置chattype，默认是单聊
         if (chatType == Constants.CHATTYPE_GROUP) {
             message.setChatType(EMMessage.ChatType.GroupChat);
         }
-        //发送消息
-        EMClient.getInstance().chatManager().sendMessage(message);
-        /***刷新消息列表的显示***/
-        mEMMessageList.add(message);//添加消息到集合对象
-        mChatMessageAdapter.notifyDataSetChanged();//刷新列表
-        if (mEMMessageList.size() > 0) {
-            //item位置移动到消息列表的最底部
-            linearlayoutManager.scrollToPosition(mChatMessageAdapter.getItemCount() - 1);
-        }
-        mEtContent.setText("");//清空输入内容
-        //mEtContent.clearFocus();//取消输入焦点
+        /*子线程中进行网络请求,避免占用主线程造成UI显示延迟*/
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //发送消息
+                EMClient.getInstance().chatManager().sendMessage(message);
+            }
+        }).start();
+        /*回到主线程进行UI更新*/
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                /***刷新消息列表的显示***/
+                mEMMessageList.add(message);//添加消息到集合对象
+                //mChatMessageAdapter.notifyItemInserted(mEMMessageList.size()-1);
+                mChatMessageAdapter.notifyDataSetChanged();//刷新列表
+                if (mEMMessageList.size() > 0) {
+                    //item位置移动到消息列表的最底部
+                    linearlayoutManager.scrollToPosition(mChatMessageAdapter.getItemCount() - 1);
+                }
+                mEtContent.setText("");//清空输入内容
+                //mEtContent.clearFocus();//取消输入焦点
+            }
+        });
     }
 
     //加载对话消息的方法
@@ -232,8 +263,7 @@ public class ChatActivity extends SimpleActivity {
         mEMConversation = EMClient.getInstance().chatManager().getConversation(
                 toChatUsername,//聊天对象
                 EaseCommonUtils.getConversationType(chatType), true);
-        // 把此会话的未读数置为0
-        mEMConversation.markAllMessagesAsRead();
+
         // 初始化db时，每个conversation加载数目是getChatOptions().getNumberOfMessagesLoaded
         // 这个数目如果比用户期望进入会话界面时显示的个数不一样，就多加载一些
         final List<EMMessage> msgs = mEMConversation.getAllMessages();//获取此会话的所有消息
@@ -254,6 +284,9 @@ public class ChatActivity extends SimpleActivity {
             //从最上面的消息位置开始,加载剩下数量的消息到本地对象来
             mEMConversation.loadMoreMsgFromDB(msgId, pagesize - msgCount);
         }
+        //指定会话消息未读数清零
+        mEMConversation.markAllMessagesAsRead();
+
         //获取未读消息数量
         //int unReadCount=mEMConversation.getUnreadMsgCount();
         //把一条消息置为已读

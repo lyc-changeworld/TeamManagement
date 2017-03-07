@@ -31,6 +31,10 @@ public class App  extends Application {
 
     private boolean isHyphenateInited = false;
 
+    //环信appkey
+    private static final String appKey="1145161121178643#teammanagement";
+
+
 
     //单例模式,避免内存造成浪费,需要实例化该类时才将其实例化
     public static synchronized App getInstance() {
@@ -67,6 +71,8 @@ public class App  extends Application {
     private EMOptions initChatOptions() {
         // 获取到EMChatOptions对象
         EMOptions options = new EMOptions();
+        /*设置环信应用的AppKey*/
+        options.setAppKey(appKey);
         // 默认添加好友时，是不需要验证的，改成需要验证
         options.setAcceptInvitationAlways(false);
         // 设置是否需要已读回执
@@ -86,7 +92,8 @@ public class App  extends Application {
         // 为了防止环信SDK被初始化2次，加此判断会保证SDK被初始化1次
         // 默认的app会在以包名为默认的process name下运行，如果查到的process name不是app的process
         // name就立即返回
-        if (processAppName == null || !processAppName.equalsIgnoreCase(sContext.getPackageName())) {
+        if (processAppName == null || !processAppName.equalsIgnoreCase(
+                sContext.getPackageName())) {
             // 则此application::onCreate 是被service 调用的，直接返回
             return false;
         }

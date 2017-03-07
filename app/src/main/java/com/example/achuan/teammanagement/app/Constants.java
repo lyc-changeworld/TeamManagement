@@ -14,7 +14,6 @@ public class Constants {
     /*MAIN TYPE CODE*/
     public static final int TYPE_SETTINGS=001;
 
-    /*MODULE_0 ITEM TYPE CODE*/
 
 
     //=================SHARED_PREFERENCE VALUE_NAME====================
@@ -25,10 +24,15 @@ public class Constants {
     //当前环信账号的用户名
     public static final String KEY_USERNAME = "username";
 
-    //=================OTHER STRING====================
+    //=================聊天相关====================
     //聊天消息的类型
+    public static final String EXTRA_USER_ID="userId";//单人聊天的名称
     public static final int CHATTYPE_SINGLE = 1;//单人
+    public static final String EXTRA_CHAT_TYPE="group_type";//群聊天类型
     public static final int CHATTYPE_GROUP = 2;//群
     public static final int CHATTYPE_CHATROOM = 3;//聊天室
+
+    //=================OTHER STRING====================
+
 
 }

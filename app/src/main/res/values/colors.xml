@@ -10,6 +10,7 @@
     <color name="colorText">#2C2C2C</color><!--默认文字-->
     <color name="colorCard">#FFFFFF</color><!--卡片的背景颜色-->
     <color name="itemDivider">#D8D8D8</color><!--列表中item的分割线颜色-->
+    <color name="dialogBackground">#EEEEEE</color><!--对话框背景色-->
     <color name="dialogButtonText">#00B2EE</color><!--对话框中按钮字体的颜色-->
     <!--评论相关-->
     <color name="comment_text">#5b5d5c</color>
