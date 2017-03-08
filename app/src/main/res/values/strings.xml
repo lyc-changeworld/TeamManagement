@@ -75,13 +75,24 @@
     <string name="Agree_with_failure">同意失败:</string>
     <string name="Refuse_with_failure">拒绝失败:</string>
 
-    <!--7-会话和聊天-->
-    <!--会话列表界面-->
+    <!--7-会话\聊天\联系人-->
     <string name="Are_delete_with">正在删除...</string>
+    <string name="Are_add_to">正在移入...</string>
+    <string name="Are_remove_from">正在移除...</string>
+    <!--会话列表界面-->
+    <string name="Delete_conversation">删除会话</string>
+    <string name="Delete_conversation_and_data">删除会话和消息</string>
     <string name="Cant_chat_with_yourself">不能和自己聊天</string>
+    <!---联系人列表界面-->
+    <string name="Delete_contactUser">删除联系人</string>
+    <string name="Add_to_blackList">移入到黑名单</string>
+    <string name="Remove_from_blackList">从黑名单移除</string>
     <!---聊天界面-->
+    <string name="Delete_message">删除消息</string>
+    <string name="Repeat">转发</string>
     <string name="text_ack_msg">已读</string>
     <string name="text_delivered_msg">送达</string>
+
 
 
 

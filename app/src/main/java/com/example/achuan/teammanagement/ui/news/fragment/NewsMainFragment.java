@@ -21,7 +21,6 @@ import com.example.achuan.teammanagement.base.SimpleFragment;
 import com.example.achuan.teammanagement.ui.news.activity.ChatActivity;
 import com.example.achuan.teammanagement.ui.news.adapter.ConversationAdapter;
 import com.example.achuan.teammanagement.util.DialogUtil;
-import com.example.achuan.teammanagement.util.LogUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
 import com.hyphenate.EMConversationListener;
@@ -118,9 +117,13 @@ public class NewsMainFragment extends SimpleFragment {
                         R.layout.dlg_two,//资源id号
                         Gravity.CENTER);//布局位置
                 //获取布局中的控件对象
-                TextView mTvDeleteConver= (TextView) dialog.findViewById(R.id.tv_delete_conver);
-                TextView mTvDeleteAll= (TextView) dialog.findViewById(R.id.tv_delete_all);
-                //删除会话
+                TextView mTvDeleteConver= (TextView) dialog.findViewById(R.id.tv_one);
+                TextView mTvDeleteAll= (TextView) dialog.findViewById(R.id.tv_two);
+                //为控件设置文本
+                mTvDeleteConver.setText(getString(R.string.Delete_conversation));
+                mTvDeleteAll.setText(getString(R.string.Delete_conversation_and_data));
+                //删除有两种选择：
+                //1.删除会话
                 mTvDeleteConver.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -128,7 +131,7 @@ public class NewsMainFragment extends SimpleFragment {
                         dialog.dismiss();
                     }
                 });
-                //删除会话和消息(会将聊天消息全部删除)
+                //2.删除会话和消息(会将本用户服务器端该会话的聊天消息全部删除)
                 mTvDeleteAll.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -152,7 +155,7 @@ public class NewsMainFragment extends SimpleFragment {
             * 1、删除某个会话时
             * 2、删除某个会话后,第一次重新进入该会话聊天界面时
             * 3、删除某个会话和全部消息后,只要消息数是0,以后每次打开应用后第一次进入该聊天界面时*/
-            LogUtil.d("what_happened","会话更新了...");
+            //LogUtil.d("what_happened","会话更新了...");
 
         }
     };
@@ -228,7 +231,7 @@ public class NewsMainFragment extends SimpleFragment {
         }
         return list;
     }
-    
+
     /**
      * 根据最后一条消息的时间排序
      * @param conversationList

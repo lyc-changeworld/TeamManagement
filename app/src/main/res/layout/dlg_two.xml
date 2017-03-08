@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--功能：dialog弹窗的自定义布局-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
@@ -10,24 +11,22 @@
         android:showDividers="middle" (必写)设置分割线的位置是在控件之间-->
 
     <TextView
-        android:id="@+id/tv_delete_conver"
+        android:id="@+id/tv_one"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:background="@color/white"
         android:gravity="center"
         android:textColor="@color/colorText"
-        android:textSize="16sp"
-        android:text="删除会话"/>
+        android:textSize="16sp"/>
     <!--删除-->
     <TextView
-        android:id="@+id/tv_delete_all"
+        android:id="@+id/tv_two"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:background="@color/white"
         android:gravity="center"
         android:textColor="@color/colorText"
-        android:textSize="16sp"
-        android:text="删除会话和消息"/>
+        android:textSize="16sp"/>
     <!--&lt;!&ndash;给条目中间添加间距&ndash;&gt;
     <android.support.v4.widget.Space
         android:id="@+id/space_null"

@@ -1,5 +1,7 @@
 package com.example.achuan.teammanagement.ui.news.activity;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,9 +9,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.achuan.teammanagement.EaseCommonUtils;
@@ -17,6 +21,7 @@ import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleActivity;
 import com.example.achuan.teammanagement.ui.news.adapter.ChatMessageAdapter;
+import com.example.achuan.teammanagement.util.DialogUtil;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
@@ -61,6 +66,7 @@ public class ChatActivity extends SimpleActivity {
     protected int pageMore=10;//下拉刷新,多加载10条消息
     //下拉刷新后,可以加载更多消息
 
+    Context mContext;
     LinearLayoutManager linearlayoutManager;
     ChatMessageAdapter mChatMessageAdapter;
 
@@ -72,6 +78,7 @@ public class ChatActivity extends SimpleActivity {
 
     @Override
     protected void initEventAndData() {
+        mContext=this;
         /*1-获取到当前聊天的联系人的名称*/
         toChatUsername = this.getIntent().getStringExtra(Constants.EXTRA_USER_ID);
         //设置标题工具栏
@@ -83,13 +90,13 @@ public class ChatActivity extends SimpleActivity {
         TextChange textChange = new TextChange();
         mEtContent.addTextChangedListener(textChange);
 
-        /*---3-将消息适配显示到列表中---*/
+        /***3-将消息适配显示到列表中***/
         initMessage();//初始化加载消息
         mEMMessageList = mEMConversation.getAllMessages();//获取到消息集合体
         //创建适配器对象
-        mChatMessageAdapter = new ChatMessageAdapter(this, mEMMessageList);
+        mChatMessageAdapter = new ChatMessageAdapter(mContext, mEMMessageList);
         //对列表的布局显示进行设置
-        linearlayoutManager = new LinearLayoutManager(this);
+        linearlayoutManager = new LinearLayoutManager(mContext);
         //列表的焦点切换到消息列表的最后一条
         linearlayoutManager.scrollToPosition(mChatMessageAdapter.getItemCount() - 1);
         //设置方向(默认是垂直,下面的是水平设置)
@@ -105,6 +112,42 @@ public class ChatActivity extends SimpleActivity {
             }
         });
 
+        /***4-为文本内容控件添加点击监听事件***/
+        //注意:该监听方法是在适配器类中自定义的
+        mChatMessageAdapter.setContentOnLongClickListener(new ChatMessageAdapter.ContentOnLongClickListener() {
+            @Override
+            public void onLongClick(View view, final int postion) {
+
+                //final EMMessage emMessage=mEMMessageList.get(postion);
+                //创建对话框
+                final Dialog dialog= DialogUtil.createMyselfDialog(ChatActivity.this,
+                        R.layout.dlg_two,//资源id号
+                        Gravity.CENTER);//布局位置
+                //获取布局中的控件对象
+                TextView mTvDeleteContact= (TextView) dialog.findViewById(R.id.tv_one);
+                TextView mTvAddToBlackList= (TextView) dialog.findViewById(R.id.tv_two);
+                //为控件设置文本
+                mTvDeleteContact.setText(getString(R.string.Delete_message));//删除消息
+                mTvAddToBlackList.setText(getString(R.string.Repeat));//转发
+                //有两种选择：
+                //1.删除消息
+                mTvDeleteContact.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        deleteMessage(postion);//删除消息操作
+                        dialog.dismiss();//记得关闭对话框
+                    }
+                });
+                //2.转发
+                mTvAddToBlackList.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //跳转到联系人界面,选择想要发送的对象
+                        dialog.dismiss();//记得关闭对话框
+                    }
+                });
+            }
+        });
 
         //添加聊天消息监听
         EMClient.getInstance().chatManager().addMessageListener(mEMMessageListener);
@@ -112,6 +155,39 @@ public class ChatActivity extends SimpleActivity {
         * 记得在不需要的时候移除listener，如在activity的onDestroy()时
           EMClient.getInstance().chatManager().removeMessageListener(msgListener);
         * */
+    }
+
+    /*5-删除某条消息记录*/
+    private void deleteMessage(final int postion){
+
+        final EMMessage deleteMsg=mEMMessageList.get(postion);
+        //创建加载进度框
+        DialogUtil.createProgressDialog(mContext,null,
+                getString(R.string.Are_delete_with),//正在删除
+                false,false);//对话框无法被取消
+        //开启子线程进行删除操作
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mEMConversation.removeMessage(deleteMsg.getMsgId());
+                /*回到主线程进行UI更新*/
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(DialogUtil.isProgressDialogShowing()){
+                            DialogUtil.closeProgressDialog();
+                        }
+                        //刷新列表显示
+                        mEMMessageList.remove(postion);
+                        //调用下面的方法进行数据刷新比较保险,
+                        //之前用notifyItemRemoved(postion)时出现了数据更新不及时的情况
+                        mChatMessageAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+
+
     }
 
     /*4-下拉刷新加载更多的消息*/

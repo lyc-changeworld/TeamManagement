@@ -34,11 +34,22 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     private OnClickListener mOnClickListener;
     private OnLongClickListener mOnLongClickListener;
 
+    //另外定义一个文本控件的接口
+    private ContentOnLongClickListener mContentOnLongClickListener;//引用变量
+    //定义接口
+    public interface  ContentOnLongClickListener{
+        void onLongClick(View view, int postion);
+    }
+    //定义set方法
+    public void setContentOnLongClickListener(ContentOnLongClickListener longClickListener) {
+        mContentOnLongClickListener = longClickListener;
+    }
+
+
     //define interface
     public interface OnClickListener {
         void onClick(View view, int postion);
     }
-
     public interface OnLongClickListener {
         void onLongClick(View view, int postion);
     }
@@ -66,6 +77,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     }
 
 
+    //设置item的type序号
     @Override
     public int getItemViewType(int position) {
         EMMessage emMessage = mEMMessageList.get(position);
@@ -101,6 +113,18 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         EMTextMessageBody emTextMessageBody= (EMTextMessageBody) emMessage.getBody();
         //显示消息
         holder.mTvChatcontent.setText(emTextMessageBody.getMessage());
+
+        /***为文本内容区域设置点击监听事件***/
+        holder.mTvChatcontent.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(mContentOnLongClickListener!=null){
+                    mContentOnLongClickListener.onLongClick(v,postion);
+                }
+                return false;//设置成false,这样就不会触发单击的监听事件
+            }
+        });
+
         /***为item设置点击监听事件***/
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
