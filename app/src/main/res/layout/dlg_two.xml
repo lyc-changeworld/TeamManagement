@@ -3,9 +3,11 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:divider="@drawable/divider"
+              android:divider="@drawable/di_item"
               android:showDividers="middle"
               android:background="@color/dialogBackground">
+    <!--android:divider 为root布局添加分割线效果
+        android:showDividers="middle" (必写)设置分割线的位置是在控件之间-->
 
     <TextView
         android:id="@+id/tv_delete_conver"

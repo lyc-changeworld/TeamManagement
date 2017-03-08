@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/margin_chat_activity"
             android:layout_toRightOf="@id/iv_userhead"
-            android:background="@drawable/chatfrom_bg"
+            android:background="@drawable/bg_chatfrom"
             android:autoLink="web"
             android:clickable="true"
             android:focusable="true"

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--功能:时间标志的背景效果-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <corners android:radius="3dp" />
-
     <solid android:color="#dcdddd" />
 
 </shape>

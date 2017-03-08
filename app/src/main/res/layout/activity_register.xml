@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!--标题工具栏-->
-    <include layout="@layout/view_toolbar"
+    <include layout="@layout/include_toolbar"
              android:id="@+id/toolbar"/>
 
     <LinearLayout

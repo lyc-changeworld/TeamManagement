@@ -61,6 +61,7 @@ public class NewsMainFragment extends SimpleFragment {
     protected void initEventAndData() {
         mContext=getActivity();//获取到上下文对象
 
+        /*1-初始化加载会话集合*/
         //创建会话集合体对象
         mEMConversationList=new ArrayList<EMConversation>();
         /*//获取到排好序的会话对象集合
@@ -78,8 +79,8 @@ public class NewsMainFragment extends SimpleFragment {
         //添加自定义的分割线
         mRv.addItemDecoration(new RyItemDivider(mContext, R.drawable.di_item));
 
-        /***3-点击item后跳转到聊天界面***/
-        final String st2 = getResources().getString(R.string.Cant_chat_with_yourself);
+        /***3-为item的点击设置监听事件***/
+        /*设置点击会话item的后跳转到聊天界面的功能*/
         mConversationAdapter.setOnClickListener(new ConversationAdapter.OnClickListener() {
             @Override
             public void onClick(View view, int postion) {
@@ -88,7 +89,9 @@ public class NewsMainFragment extends SimpleFragment {
                 String username = conversation.conversationId();
                 //不能和自己聊天哟
                 if (username.equals(SharedPreferenceUtil.getCurrentUserName()))
-                    Toast.makeText(mContext, st2, Toast.LENGTH_SHORT).show();
+                    //提示:不能和自己聊
+                    Toast.makeText(mContext, getString(R.string.Cant_chat_with_yourself),
+                            Toast.LENGTH_SHORT).show();
                 else {
                     // 进入聊天页面
                     Intent intent = new Intent(mContext, ChatActivity.class);
@@ -112,38 +115,27 @@ public class NewsMainFragment extends SimpleFragment {
             @Override
             public void onLongClick(View view, final int postion) {
                 final Dialog dialog=DialogUtil.createMyselfDialog(mContext,
-                        R.layout.dialog_two,
-                        Gravity.CENTER);
-
+                        R.layout.dlg_two,//资源id号
+                        Gravity.CENTER);//布局位置
+                //获取布局中的控件对象
                 TextView mTvDeleteConver= (TextView) dialog.findViewById(R.id.tv_delete_conver);
                 TextView mTvDeleteAll= (TextView) dialog.findViewById(R.id.tv_delete_all);
-
                 //删除会话
                 mTvDeleteConver.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //删除和某个user会话，如果需要保留聊天记录，传false
-                        EMClient.getInstance().chatManager().deleteConversation(
-                                mEMConversationList.get(postion).conversationId(),
-                                false);
+                        deleteConversation(postion,false);
                         dialog.dismiss();
                     }
                 });
-                //删除会话和消息(会将消息全部删除)
+                //删除会话和消息(会将聊天消息全部删除)
                 mTvDeleteAll.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //删除和某个user会话，如果需要保留聊天记录，传false
-                        EMClient.getInstance().chatManager().deleteConversation(
-                                mEMConversationList.get(postion).conversationId(),
-                                true);
+                        deleteConversation(postion,true);
                         dialog.dismiss();
                     }
                 });
-
-
-
-
             }
         });
 
@@ -152,46 +144,53 @@ public class NewsMainFragment extends SimpleFragment {
         EMClient.getInstance().chatManager().addConversationListener(mEMConversationListener);
     }
 
-    /*创建对话监听器实例对象*/
+    /*3-创建对话监听器实例对象*/
     EMConversationListener mEMConversationListener=new EMConversationListener() {
         @Override
         public void onCoversationUpdate() {
+            /*触发该监听的情况：
+            * 1、删除某个会话时
+            * 2、删除某个会话后,第一次重新进入该会话聊天界面时
+            * 3、删除某个会话和全部消息后,只要消息数是0,以后每次打开应用后第一次进入该聊天界面时*/
             LogUtil.d("what_happened","会话更新了...");
 
         }
     };
 
-
-
-    //从其它的activity返回mainActivity时是回到焦点,此时更新列表较为合理
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
+    /*2-删除会话的方法*/
+    private void deleteConversation(final int postion, final boolean isDeleteNews){
+        //创建加载进度框
+        DialogUtil.createProgressDialog(mContext,null,
+                getString(R.string.Are_delete_with),//正在删除
+                false,false);//对话框无法被取消
+        //开启子线程进行删除操作
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //删除和某个user会话，如果需要保留聊天记录，传false
+                EMClient.getInstance().chatManager().deleteConversation(
+                        mEMConversationList.get(postion).conversationId(),
+                        isDeleteNews);//false代表不删除消息,true则相反
+                /*回到主线程进行UI更新*/
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(DialogUtil.isProgressDialogShowing()){
+                            DialogUtil.closeProgressDialog();
+                        }
+                        //刷新列表显示
+                        mEMConversationList.remove(postion);
+                        //调用下面的方法进行数据刷新比较保险,
+                        //之前用notifyItemRemoved(postion)时出现了数据更新不及时的情况
+                        mConversationAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
     }
-
-    //在碎片处于非遮挡状态时重新刷新消息列表显示
-    //经实验,从mainActivity跳转到其它activity并不是碎片被遮挡,只有在单个活动中切换碎片时才叫遮挡
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        //非遮挡状态时刷新显示
-        if(!hidden){
-            refresh();
-        }
-    }
-
-    /*刷新列表显示*/
-    private void refresh(){
-        //重新加载显示列表
-        mEMConversationList.clear();
-        mEMConversationList.addAll(loadConversationList());
-        mConversationAdapter.notifyDataSetChanged();
-    }
-
 
     /**
-     * 获取会话列表
+     * 1-获取会话列表
      * @return List<EMConversation>
      */
     protected List<EMConversation> loadConversationList() {
@@ -229,8 +228,7 @@ public class NewsMainFragment extends SimpleFragment {
         }
         return list;
     }
-
-
+    
     /**
      * 根据最后一条消息的时间排序
      * @param conversationList
@@ -253,6 +251,33 @@ public class NewsMainFragment extends SimpleFragment {
     }
 
 
+    //从其它的activity返回mainActivity时是回到焦点,此时更新列表较为合理
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
+    }
+
+    //在碎片处于非遮挡状态时重新刷新消息列表显示
+    //经实验,从mainActivity跳转到其它activity并不是碎片被遮挡,只有在单个活动中切换碎片时才叫遮挡
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        //非遮挡状态时刷新显示
+        if(!hidden){
+            refresh();
+        }
+    }
+
+    /*刷新列表显示*/
+    private void refresh(){
+        //重新加载显示列表
+        mEMConversationList.clear();
+        mEMConversationList.addAll(loadConversationList());
+        mConversationAdapter.notifyDataSetChanged();
+    }
+
+    /*碎片销毁时记得移除监听*/
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -267,6 +292,5 @@ public class NewsMainFragment extends SimpleFragment {
         ButterKnife.bind(this, rootView);
         return rootView;
     }
-
 
 }

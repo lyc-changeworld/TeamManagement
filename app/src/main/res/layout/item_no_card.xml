@@ -3,7 +3,7 @@
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="70dp">
-    <com.example.achuan.materialtemplate.widget.SquareImageView
+    <com.example.achuan.teammanagement.widget.SquareImageView
         android:id="@+id/square_iv"
         android:scaleType="centerCrop"
         android:transitionName="shareView"

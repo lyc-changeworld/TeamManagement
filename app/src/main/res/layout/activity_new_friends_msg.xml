@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/view_toolbar"
+    <include layout="@layout/include_toolbar"
              android:id="@+id/toolbar"/>
     <!--添加列表控件-->
     <android.support.v7.widget.RecyclerView

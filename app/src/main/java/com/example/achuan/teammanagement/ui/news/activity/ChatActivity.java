@@ -83,24 +83,19 @@ public class ChatActivity extends SimpleActivity {
         TextChange textChange = new TextChange();
         mEtContent.addTextChangedListener(textChange);
 
-
-        getAllMessage();//加载消息记录
-        mEMMessageList = mEMConversation.getAllMessages();//获取到消息集合体
-
         /*---3-将消息适配显示到列表中---*/
+        initMessage();//初始化加载消息
+        mEMMessageList = mEMConversation.getAllMessages();//获取到消息集合体
         //创建适配器对象
         mChatMessageAdapter = new ChatMessageAdapter(this, mEMMessageList);
         //对列表的布局显示进行设置
         linearlayoutManager = new LinearLayoutManager(this);
-        //item位置更新到消息列表的最后一条
+        //列表的焦点切换到消息列表的最后一条
         linearlayoutManager.scrollToPosition(mChatMessageAdapter.getItemCount() - 1);
-
-
         //设置方向(默认是垂直,下面的是水平设置)
         //linearlayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRv.setLayoutManager(linearlayoutManager);//为列表添加布局
         mRv.setAdapter(mChatMessageAdapter);//为列表添加适配器
-
         /*添加刷新控件的下拉刷新事件监听接口*/
         mSwRf.setColorSchemeResources(R.color.colorAccent);//刷新条的颜色
         mSwRf.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -119,7 +114,7 @@ public class ChatActivity extends SimpleActivity {
         * */
     }
 
-    /*下拉刷新加载更多的消息*/
+    /*4-下拉刷新加载更多的消息*/
     private void getMoreMessage() {
 
         List<EMMessage> msgs = mEMConversation.getAllMessages();//当前会话的消息集合
@@ -163,7 +158,7 @@ public class ChatActivity extends SimpleActivity {
         }
     }
 
-
+    /*3-注册消息监听来接收消息*/
     EMMessageListener mEMMessageListener = new EMMessageListener() {
         @Override
         public void onMessageReceived(final List<EMMessage> messages) {
@@ -219,8 +214,7 @@ public class ChatActivity extends SimpleActivity {
         }
     };
 
-
-    //发送消息给对方的方法
+    /*2-发送消息给对方的方法*/
     private void setMesaage() {
         //获取要发送的文本消息
         String content = mEtContent.getText().toString().trim();
@@ -237,28 +231,29 @@ public class ChatActivity extends SimpleActivity {
             public void run() {
                 //发送消息
                 EMClient.getInstance().chatManager().sendMessage(message);
+                /*回到主线程进行UI更新*/
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        /***刷新消息列表的显示***/
+                        mEMMessageList.add(message);//添加消息到集合对象
+                        //mChatMessageAdapter.notifyItemInserted(mEMMessageList.size()-1);
+                        mChatMessageAdapter.notifyDataSetChanged();//刷新列表
+                        if (mEMMessageList.size() > 0) {
+                            //item位置移动到消息列表的最底部
+                            linearlayoutManager.scrollToPosition(mChatMessageAdapter.getItemCount() - 1);
+                        }
+                        mEtContent.setText("");//清空输入内容
+                        //mEtContent.clearFocus();//取消输入焦点
+                    }
+                });
             }
         }).start();
-        /*回到主线程进行UI更新*/
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                /***刷新消息列表的显示***/
-                mEMMessageList.add(message);//添加消息到集合对象
-                //mChatMessageAdapter.notifyItemInserted(mEMMessageList.size()-1);
-                mChatMessageAdapter.notifyDataSetChanged();//刷新列表
-                if (mEMMessageList.size() > 0) {
-                    //item位置移动到消息列表的最底部
-                    linearlayoutManager.scrollToPosition(mChatMessageAdapter.getItemCount() - 1);
-                }
-                mEtContent.setText("");//清空输入内容
-                //mEtContent.clearFocus();//取消输入焦点
-            }
-        });
+
     }
 
-    //加载对话消息的方法
-    protected void getAllMessage() {
+    /*1-初始化加载对话消息的方法*/
+    private void initMessage() {
         // 获取当前聊天对象的会话对象
         mEMConversation = EMClient.getInstance().chatManager().getConversation(
                 toChatUsername,//聊天对象
@@ -339,6 +334,7 @@ public class ChatActivity extends SimpleActivity {
         ButterKnife.bind(this);
     }
 
+    /*记得在activity销毁时移除消息监听*/
     @Override
     protected void onDestroy() {
         super.onDestroy();

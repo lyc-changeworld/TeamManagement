@@ -63,7 +63,7 @@
     <string name="send_successful">发送请求成功,等待对方验证</string>
     <string name="Request_add_buddy_failure">请求添加好友失败:</string>
 
-    <!--6-申请于通知界面-->
+    <!--6-申请通知界面-->
     <string name="Has_agreed_to_your_friend_request">已同意你的好友请求</string>
     <string name="Request_to_add_you_as_a_friend">请求加你为好友</string>
     <string name="agree">同意</string>
@@ -75,9 +75,10 @@
     <string name="Agree_with_failure">同意失败:</string>
     <string name="Refuse_with_failure">拒绝失败:</string>
 
-    <!--消息列表界面-->
+    <!--7-会话和聊天-->
+    <!--会话列表界面-->
+    <string name="Are_delete_with">正在删除...</string>
     <string name="Cant_chat_with_yourself">不能和自己聊天</string>
-
     <!---聊天界面-->
     <string name="text_ack_msg">已读</string>
     <string name="text_delivered_msg">送达</string>
