@@ -90,8 +90,17 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         EMConversation conversation = mEMConversationList.get(postion);
         // 获取用户username或者群组groupid
         String username = conversation.conversationId();
-        holder.mTvName.setText("与 " + username + " 的会话");
 
+
+        /*1-设置头像图标*/
+        if(conversation.isGroup()){
+            holder.mIvAvatar.setImageResource(R.drawable.em_group_icon);
+        }else {
+            holder.mIvAvatar.setImageResource(R.drawable.default_avatar);
+        }
+        /*2-设置聊天对象名称*/
+        holder.mTvName.setText("与 " + username + " 的会话");
+        /*3-设置未读消息数*/
         if (conversation.getUnreadMsgCount() > 0) {
             // 显示与此用户的消息未读数
             holder.mTvUnreadMsgNumber.setText(
@@ -100,6 +109,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         } else {
             holder.mTvUnreadMsgNumber.setVisibility(View.INVISIBLE);
         }
+        /*4-设置最后一条消息内容及时间*/
         if (conversation.getAllMsgCount() != 0) {
             // 把最后一条消息的内容作为item的message内容
             EMMessage lastMessage = conversation.getLastMessage();
@@ -141,15 +151,36 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     public static class ViewHolder extends RecyclerView.ViewHolder {
         //使用butterknife来进行item中的控件加载,此处需要自己添加
         @BindView(R.id.tv_unread_msg_number)
-        TextView mTvUnreadMsgNumber;/** 消息未读数 */
+        TextView mTvUnreadMsgNumber;
+        /**
+         * 消息未读数
+         */
         @BindView(R.id.tv_name)
-        TextView mTvName;/** 和谁的聊天记录 */
+        TextView mTvName;
+        /**
+         * 和谁的聊天记录
+         */
         @BindView(R.id.tv_time)
-        TextView mTvTime;/** 最后一条消息的时间 */
+        TextView mTvTime;
+        /**
+         * 最后一条消息的时间
+         */
         @BindView(R.id.tv_msg_state)
-        ImageView mTvMsgState;/** 最后一条消息的发送状态 */
+        ImageView mTvMsgState;
+        /**
+         * 最后一条消息的发送状态
+         */
         @BindView(R.id.tv_message)
-        TextView mTvMessage;/** 最后一条消息的内容 */
+        TextView mTvMessage;
+
+        /**
+         * 最后一条消息的内容
+         */
+        @BindView(R.id.iv_avatar)
+        ImageView mIvAvatar;
+        /*
+        * 头像
+        * */
         ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);

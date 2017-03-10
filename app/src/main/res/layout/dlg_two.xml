@@ -1,44 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--功能：dialog弹窗的自定义布局-->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:divider="@drawable/di_item"
-              android:showDividers="middle"
-              android:background="@color/dialogBackground">
-    <!--android:divider 为root布局添加分割线效果
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="3dp"
+    android:layout_marginStart="6dp"
+    android:layout_marginEnd="6dp"
+    android:layout_marginBottom="3dp"
+    app:cardBackgroundColor="@color/colorCard"
+    app:cardElevation="0dp"
+    app:cardCornerRadius="2dp">
+    <!--app:cardElevation="0dp" 卡片的高度
+    app:cardCornerRadius="2dp" 卡片的边缘弧度数-->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@drawable/di_item"
+        android:showDividers="middle"
+        android:background="@color/dialogBackground">
+        <!--android:divider 为root布局添加分割线效果
         android:showDividers="middle" (必写)设置分割线的位置是在控件之间-->
+        <TextView
+            android:id="@+id/tv_one"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:textColor="@color/colorText"
+            android:textSize="16sp"
+            android:paddingLeft="15dp"/>
+        <!--删除-->
+        <TextView
+            android:id="@+id/tv_two"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:textColor="@color/colorText"
+            android:textSize="16sp"
+            android:paddingLeft="15dp"/>
+        <!--&lt;!&ndash;给条目中间添加间距&ndash;&gt;
+        <android.support.v4.widget.Space
+            android:id="@+id/space_null"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"/>
+        <TextView
+            android:id="@+id/tv_choose_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:textColor="@color/colorText"
+            android:textSize="16sp"
+            android:text="取消"/>-->
+    </LinearLayout>
+</android.support.v7.widget.CardView>
 
-    <TextView
-        android:id="@+id/tv_one"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:background="@color/white"
-        android:gravity="center"
-        android:textColor="@color/colorText"
-        android:textSize="16sp"/>
-    <!--删除-->
-    <TextView
-        android:id="@+id/tv_two"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:background="@color/white"
-        android:gravity="center"
-        android:textColor="@color/colorText"
-        android:textSize="16sp"/>
-    <!--&lt;!&ndash;给条目中间添加间距&ndash;&gt;
-    <android.support.v4.widget.Space
-        android:id="@+id/space_null"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"/>
-    <TextView
-        android:id="@+id/tv_choose_cancel"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:background="@color/white"
-        android:gravity="center"
-        android:textColor="@color/colorText"
-        android:textSize="16sp"
-        android:text="取消"/>-->
-</LinearLayout>
+
+
+

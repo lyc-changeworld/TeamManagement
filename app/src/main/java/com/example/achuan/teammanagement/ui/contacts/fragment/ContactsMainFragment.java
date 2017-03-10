@@ -17,6 +17,7 @@ import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleFragment;
 import com.example.achuan.teammanagement.model.db.ContactUser;
 import com.example.achuan.teammanagement.model.db.DBManager;
+import com.example.achuan.teammanagement.ui.contacts.activity.GroupChatActivity;
 import com.example.achuan.teammanagement.ui.contacts.activity.NewFriendsMsgActivity;
 import com.example.achuan.teammanagement.ui.contacts.adapter.ContactAdapter;
 import com.example.achuan.teammanagement.ui.news.activity.ChatActivity;
@@ -61,21 +62,23 @@ public class ContactsMainFragment extends SimpleFragment {
         mContext = getActivity();
         mContactUserList = new ArrayList<ContactUser>();//创建集合对象
 
-        /***1-先添加最顶部的"申请与通知"入口,该item点击后将跳转到申请消息界面
-         * 后续还将添加群聊入口***/
-        ContactUser top =new ContactUser();
-        top.setUserName(getString(R.string.new_friends_msg));
-        mContactUserList.add(top);//添加顶上的那个数据栏
+        /*1-添加"申请与通知"、"群聊"的入口栏,点击item后跳转到对应栏目*/
+        ContactUser topOne =new ContactUser();
+        ContactUser topTwo =new ContactUser();
+        topOne.setUserName(getString(R.string.new_friends_msg));//申请与通知
+        topTwo.setUserName(getString(R.string.group_chat));//群聊
+        mContactUserList.add(topOne);
+        mContactUserList.add(topTwo);
 
+        /*2-*/
         //初始化获取本地联系人数据
         Map<String, ContactUser> localUsers = DBManager.getContactList();
         Collection values = localUsers.values();//获取Map集合的value集合
         mContactUserList.addAll(values);
         //getContactList();//过滤黑名单及排序
-
-        /*2-*/
         //创建联系人列表适配器对象实例
         mContactAdapter=new ContactAdapter(mContext, mContactUserList);
+
         /***3-对列表的布局显示进行设置***/
         LinearLayoutManager linearlayoutManager = new LinearLayoutManager(mContext);
         //设置方向(默认是垂直,下面的是水平设置)
@@ -93,7 +96,11 @@ public class ContactsMainFragment extends SimpleFragment {
                     //如果点击最顶上item,跳转到申请消息界面
                     Intent intent=new Intent(mContext, NewFriendsMsgActivity.class);
                     startActivity(intent);
-                }else {
+                }else if(postion==1){
+                    //跳转到群聊主界面
+                    Intent intent=new Intent(mContext, GroupChatActivity.class);
+                    startActivity(intent);
+                } else {
                     //点击联系人跳转到对应人的聊天界面
                     Intent intent=new Intent(mContext,ChatActivity.class);
                     //发送联系人的名称到聊天界面
@@ -107,8 +114,8 @@ public class ContactsMainFragment extends SimpleFragment {
         mContactAdapter.setOnLongClickListener(new ContactAdapter.OnLongClickListener() {
             @Override
             public void onLongClick(View view, final int postion) {
-                //屏蔽掉最顶端的item
-                if(postion!=0){
+                //屏蔽掉顶端的item栏
+                if(postion>1){
                     //获取对象名
                     final String username=mContactUserList.get(postion).getUserName();
                     //创建对话框

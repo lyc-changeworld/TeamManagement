@@ -16,6 +16,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+
+/*
+* 踩坑经验：http://blog.csdn.net/qq137722697/article/details/52200355
+* */
+
 /**
  * Created by achuan on 17-1-25.
  * 功能：
@@ -65,6 +70,8 @@ public class App  extends Application {
             EMClient.getInstance().setDebugMode(true);
             // 初始化数据库
             //initDbDao(context);
+            /***初始化使用EaseUI***/
+            //EaseUI.getInstance().init(sContext,options);
         }
     }
     /*-----第一步:设置EMOptions参数-----*/

@@ -13,7 +13,7 @@
 
     <!--2-BottomNavMenu中的菜单项的标题-->
     <string name="bottom_title_0">消息</string>
-    <string name="bottom_title_1">联系人</string>
+    <string name="bottom_title_1">通讯录</string>
     <string name="bottom_title_2">发现</string>
     <string name="bottom_title_3">我的</string>
 
@@ -24,6 +24,8 @@
     <string name="toolbar_main_title_3">扫一扫</string>
 
     <!--4-不同界面Toolbar上标题内容-->
+    <string name="add_group">新建群组</string>
+    <string name="group_chat">群聊</string>
     <string name="add_contact">申请好友</string>
     <string name="new_friends_msg">申请与通知</string>
 
@@ -93,7 +95,17 @@
     <string name="text_ack_msg">已读</string>
     <string name="text_delivered_msg">送达</string>
 
-
+    <!--8-群聊相关-->
+    <!--新建群组-->
+    <string name="save">保存</string>
+    <string name="Group_name_cannot_be_empty">群组名称不能为空</string>
+    <string name="base_setting">基本信息</string>
+    <string name="group_name">群组名称(必填)</string>
+    <string name="group_desc">群组简介</string>
+    <string name="permission_setting">权限设置</string>
+    <string name="isPublic">是否公开</string>
+    <string name="isMemberCanInvite">开放群成员邀请</string>
+    <string name="isJoinNeedApproval">加入公开群需要群主同意</string>
 
 
 

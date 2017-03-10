@@ -57,10 +57,16 @@
             而对于有滚动控件的布局，则是采用的adjustResize方式-->
             <!--禁止进入activity自动弹出键盘:添加stateHidden|stateUnchanged-->
         </activity>
+        <!--群聊主界面-->
+        <activity android:name=".ui.contacts.activity.GroupChatActivity"></activity>
+        <!--新建群组界面-->
+        <activity android:name=".ui.contacts.activity.NewGroupActivity"></activity>
+        <!--选择联系人界面-->
+        <activity android:name=".ui.contacts.activity.GroupPickContactsActivity"></activity>
 
 
         <!--********************************环信配置相关********************************-->
-        <!-- 设置环信应用的AppKey -->
+        <!-- 设置环信应用的AppKey 可以在Application文件中java代码设置-->
         <!--<meta-data android:name="EASEMOB_APPKEY"  android:value="1145161121178643#teammanagement" />-->
         <!-- 声明SDK所需的service SDK核心功能-->
         <service android:name="com.hyphenate.chat.EMChatService" android:exported="true"/>
