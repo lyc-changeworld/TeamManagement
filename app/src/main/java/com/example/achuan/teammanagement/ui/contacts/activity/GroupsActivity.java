@@ -18,7 +18,7 @@ import butterknife.ButterKnife;
  * 功能：展示我参与的群聊以及新建群组、搜索群等
  */
 
-public class GroupChatActivity extends SimpleActivity {
+public class GroupsActivity extends SimpleActivity {
 
 
     @BindView(R.id.toolbar)
@@ -46,6 +46,11 @@ public class GroupChatActivity extends SimpleActivity {
 
     }
 
+    //获取下一个活动传递过来的数据的方法
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     /*-----为工具栏创建菜单选项按钮-----*/
     @Override

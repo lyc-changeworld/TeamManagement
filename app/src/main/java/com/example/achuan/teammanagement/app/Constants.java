@@ -12,7 +12,7 @@ public class Constants {
     public static final int TYPE_EXPLORE=300;
     public static final int TYPE_MYSELF=400;
     /*MAIN TYPE CODE*/
-    public static final int TYPE_SETTINGS=001;
+    public static final int TYPE_SETTINGS=101;
 
 
 
@@ -24,13 +24,19 @@ public class Constants {
     //当前环信账号的用户名
     public static final String KEY_USERNAME = "username";
 
-    //=================聊天相关====================
+
+    //=================环信即时通讯相关====================
     //聊天消息的类型
     public static final String EXTRA_USER_ID="userId";//单人聊天的名称
-    public static final int CHATTYPE_SINGLE = 1;//单人
+    public static final int CHATTYPE_SINGLE = 10;//单人
     public static final String EXTRA_CHAT_TYPE="group_type";//群聊天类型
-    public static final int CHATTYPE_GROUP = 2;//群
-    public static final int CHATTYPE_CHATROOM = 3;//聊天室
+    public static final int CHATTYPE_GROUP = 20;//群
+    public static final int CHATTYPE_CHATROOM = 30;//聊天室
+
+
+    //=================REQUEST CODE请求码====================
+    public static final int GROUP_PICK_CONTACTS_REQUEST_CODE=0;
+
 
     //=================OTHER STRING====================
 

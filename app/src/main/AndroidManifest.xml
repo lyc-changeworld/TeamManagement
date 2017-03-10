@@ -58,7 +58,7 @@
             <!--禁止进入activity自动弹出键盘:添加stateHidden|stateUnchanged-->
         </activity>
         <!--群聊主界面-->
-        <activity android:name=".ui.contacts.activity.GroupChatActivity"></activity>
+        <activity android:name=".ui.contacts.activity.GroupsActivity"></activity>
         <!--新建群组界面-->
         <activity android:name=".ui.contacts.activity.NewGroupActivity"></activity>
         <!--选择联系人界面-->

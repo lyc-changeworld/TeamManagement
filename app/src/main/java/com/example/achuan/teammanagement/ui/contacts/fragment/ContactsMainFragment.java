@@ -17,7 +17,7 @@ import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleFragment;
 import com.example.achuan.teammanagement.model.db.ContactUser;
 import com.example.achuan.teammanagement.model.db.DBManager;
-import com.example.achuan.teammanagement.ui.contacts.activity.GroupChatActivity;
+import com.example.achuan.teammanagement.ui.contacts.activity.GroupsActivity;
 import com.example.achuan.teammanagement.ui.contacts.activity.NewFriendsMsgActivity;
 import com.example.achuan.teammanagement.ui.contacts.adapter.ContactAdapter;
 import com.example.achuan.teammanagement.ui.news.activity.ChatActivity;
@@ -98,7 +98,7 @@ public class ContactsMainFragment extends SimpleFragment {
                     startActivity(intent);
                 }else if(postion==1){
                     //跳转到群聊主界面
-                    Intent intent=new Intent(mContext, GroupChatActivity.class);
+                    Intent intent=new Intent(mContext, GroupsActivity.class);
                     startActivity(intent);
                 } else {
                     //点击联系人跳转到对应人的聊天界面

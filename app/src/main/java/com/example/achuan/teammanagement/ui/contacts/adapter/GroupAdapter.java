@@ -19,7 +19,7 @@ import butterknife.ButterKnife;
  *      MyBean是一个(模板)数据模型类,路径为：model/bean/
  *      注意：该文件具体使用时需移动到对应ui/modulexxx/adapter文件目录下,方便管理
  */
-public  class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.ViewHolder> {
+public  class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
 
     private LayoutInflater mInflater;//创建布局装载对象来获取相关控件（类似于findViewById()）
     private Context mContext;//显示框面
@@ -46,7 +46,7 @@ public  class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Vie
     }
 
     /*构造方法*/
-    public GroupChatAdapter(Context mContext, List<MyBean> myBeanList) {
+    public GroupAdapter(Context mContext, List<MyBean> myBeanList) {
         this.mContext = mContext;
         this.mList=myBeanList;
         //通过获取context来初始化mInflater对象
