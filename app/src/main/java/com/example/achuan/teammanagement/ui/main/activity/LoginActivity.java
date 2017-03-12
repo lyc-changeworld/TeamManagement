@@ -42,6 +42,8 @@ import butterknife.OnClick;
 
 public class LoginActivity extends SimpleActivity {
 
+    public static final String TAG="LoginActivity";
+
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.tv_forgetPassword)
@@ -61,8 +63,6 @@ public class LoginActivity extends SimpleActivity {
 
     /*对应EditText控件中输入字符的引用变量*/
     String userName, password;
-
-    private static final String TAG = "LoginActivity";
 
     private boolean progressShow;
 

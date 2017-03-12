@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
+import com.hyphenate.easeui.controller.EaseUI;
 
 import org.litepal.LitePal;
 
@@ -54,7 +55,7 @@ public class App  extends Application {
         sContext=getApplicationContext();//获得一个应用程序级别的Context
         /*---Litepal数据库初始化---*/
         LitePal.initialize(this);
-        /***环信-初始化SDK***/
+        /***环信-初始化SDK和EaseUI***/
         initHyphenate(sContext);
     }
 
@@ -71,7 +72,7 @@ public class App  extends Application {
             // 初始化数据库
             //initDbDao(context);
             /***初始化使用EaseUI***/
-            //EaseUI.getInstance().init(sContext,options);
+            EaseUI.getInstance().init(sContext,options);
         }
     }
     /*-----第一步:设置EMOptions参数-----*/

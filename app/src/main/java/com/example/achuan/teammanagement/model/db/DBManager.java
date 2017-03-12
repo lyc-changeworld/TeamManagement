@@ -1,5 +1,7 @@
 package com.example.achuan.teammanagement.model.db;
 
+import com.example.achuan.teammanagement.util.StringUtil;
+
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
@@ -77,6 +79,9 @@ public class DBManager {
         contactUser.setUserName(user.getUserName());
         contactUser.setNick(user.getNick());
         contactUser.setAvatar(user.getAvatar());
+        //设置首字母
+        contactUser.setInitialLetter(
+                StringUtil.getHeadChar(contactUser.getUserName()));
         //调用该方法避免重复添加联系人
         contactUser.saveIfNotExist("userName=?",contactUser.getUserName());
     }
@@ -95,6 +100,9 @@ public class DBManager {
             user.setUserName(contactUser.getUserName());
             user.setNick(contactUser.getNick());
             user.setAvatar(contactUser.getAvatar());
+            //设置首字母
+            contactUser.setInitialLetter(
+                    StringUtil.getHeadChar(contactUser.getUserName()));
             //user.save();
             //调用该方法避免重复添加联系人
             user.saveIfNotExist("userName=?",contactUser.getUserName());

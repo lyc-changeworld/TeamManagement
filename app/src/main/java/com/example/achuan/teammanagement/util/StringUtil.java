@@ -43,11 +43,11 @@ public class StringUtil {
                         return stringArray[0].charAt(0);
                     }
                 } catch (BadHanyuPinyinOutputFormatCombination e) {
-                    return ' ';
+                    return '#';
                 }
             }
         }
-        return ' ';
+        return '#';
     }
 
     /**

@@ -52,13 +52,10 @@ public class NewGroupActivity extends SimpleActivity {
     @BindView(R.id.tv_second_desc)
     TextView mTvSecondDesc;
 
-    //boolean groupStyle=;
-
-
 
     @Override
     protected int getLayout() {
-        return R.layout.activity_add_group;
+        return R.layout.activity_new_group;
     }
 
     @Override
@@ -83,6 +80,7 @@ public class NewGroupActivity extends SimpleActivity {
 
     }
 
+    //跳转到选择联系人界面
     private void save(){
         String name=mEtGroupName.getText().toString().trim();
         if(TextUtils.isEmpty(name)){
@@ -91,10 +89,10 @@ public class NewGroupActivity extends SimpleActivity {
                     Toast.LENGTH_SHORT).show();
         }else {
             //跳转到联系人选择界面
-            /*Intent intent=new Intent(this, GroupPickContactsActivity.class);
-            intent.putExtra("groupName", name);
+            Intent intent=new Intent(this, GroupPickContactsActivity.class);
+            intent.putExtra(Constants.GROUP_NAME, name);
             //该启动方法会在后者活动销毁后返回信息过来,0代表消息回执码
-            startActivityForResult(intent, Constants.GROUP_PICK_CONTACTS_REQUEST_CODE);*/
+            startActivityForResult(intent, Constants.GROUP_PICK_CONTACTS_REQUEST_CODE);
         }
     }
 
@@ -122,13 +120,14 @@ public class NewGroupActivity extends SimpleActivity {
                                 String groupName=mEtGroupName.getText().toString().trim();
                                 String desc=mEtDesc.getText().toString().trim();
                                 //2.获取到传递过来的群组初始成员数组
-                                String[] members = data.getStringArrayExtra("newmembers");
+                                String[] members = data.getStringArrayExtra(Constants.NEW_MEMBERS);
                                 //3.设置邀请成员加入的reason(当前用户+邀请加入+群名称)
                                 String reason=EMClient.getInstance().getCurrentUser()+
                                         getString(R.string.invite_join_group)+groupName;
                                 //4.创建配置参数的实例对象,然后设置相关属性
                                 EMGroupManager.EMGroupOptions option = new EMGroupManager.EMGroupOptions();
                                 option.maxUsers=200;//设置群组最大用户数(默认200)
+                                //群组人数的设置后续将实现
                                 //判断复选框的选择状态对权限进行设定
                         /*option里的GroupStyle分别为：
                         EMGroupStylePrivateOnlyOwnerInvite——私有群，只有群主可以邀请人；

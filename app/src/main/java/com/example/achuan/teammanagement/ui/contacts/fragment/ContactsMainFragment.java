@@ -23,11 +23,12 @@ import com.example.achuan.teammanagement.ui.contacts.adapter.ContactAdapter;
 import com.example.achuan.teammanagement.ui.news.activity.ChatActivity;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
+import com.example.achuan.teammanagement.widget.SideBar;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by achuan on 17-2-1.
- * 功能：
+ * 功能：联系人展示界面
  */
 
 public class ContactsMainFragment extends SimpleFragment {
@@ -45,11 +46,16 @@ public class ContactsMainFragment extends SimpleFragment {
 
     @BindView(R.id.rv)
     RecyclerView mRv;
+    @BindView(R.id.sidebar)
+    SideBar mSidebar;
+    @BindView(R.id.tv_floating_header)
+    TextView mTvFloatingHeader;
 
     Context mContext;//上下文操作对象
     ContactAdapter mContactAdapter;//适配器
     Map<String, ContactUser> contactsMap;//指向本地联系人集合
     List<ContactUser> mContactUserList;//真正显示在列表中的联系人集合
+
 
 
     @Override
@@ -62,24 +68,26 @@ public class ContactsMainFragment extends SimpleFragment {
         mContext = getActivity();
         mContactUserList = new ArrayList<ContactUser>();//创建集合对象
 
-        /*1-添加"申请与通知"、"群聊"的入口栏,点击item后跳转到对应栏目*/
-        ContactUser topOne =new ContactUser();
-        ContactUser topTwo =new ContactUser();
+        /**1-添加"申请与通知"、"群聊"的入口栏,点击item后跳转到对应栏目
+         * 注意：这部分建议使用include<>文件包裹为头部布局</>*/
+        ContactUser topOne = new ContactUser();
+        ContactUser topTwo = new ContactUser();
         topOne.setUserName(getString(R.string.new_friends_msg));//申请与通知
         topTwo.setUserName(getString(R.string.group_chat));//群聊
-        mContactUserList.add(topOne);
-        mContactUserList.add(topTwo);
 
-        /*2-*/
-        //初始化获取本地联系人数据
-        Map<String, ContactUser> localUsers = DBManager.getContactList();
-        Collection values = localUsers.values();//获取Map集合的value集合
-        mContactUserList.addAll(values);
+        /**2-对联系人数据进行处理*/
+        //先获取本地联系人集合数据
+        mContactUserList = new ArrayList<ContactUser>(
+                DBManager.getContactList().values());
+        /*让数组中的数据按照compareTo方法中的规则返回的结果进行排序*/
+        Collections.sort(mContactUserList);//联系人排好序的集合
+        mContactUserList.add(0, topTwo);//第二行
+        mContactUserList.add(0, topOne);//第一行
         //getContactList();//过滤黑名单及排序
-        //创建联系人列表适配器对象实例
-        mContactAdapter=new ContactAdapter(mContext, mContactUserList);
 
         /***3-对列表的布局显示进行设置***/
+        //创建联系人列表适配器对象实例
+        mContactAdapter = new ContactAdapter(mContext, mContactUserList);
         LinearLayoutManager linearlayoutManager = new LinearLayoutManager(mContext);
         //设置方向(默认是垂直,下面的是水平设置)
         //linearlayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -87,22 +95,23 @@ public class ContactsMainFragment extends SimpleFragment {
         mRv.setAdapter(mContactAdapter);//为列表添加适配器
         //添加自定义的分割线
         mRv.addItemDecoration(new RyItemDivider(mContext, R.drawable.di_item));
+
         /***4-为列表item添加点击监听事件***/
         //点击事件
         mContactAdapter.setOnClickListener(new ContactAdapter.OnClickListener() {
             @Override
             public void onClick(View view, int postion) {
-                if(postion==0){
+                if (postion == 0) {
                     //如果点击最顶上item,跳转到申请消息界面
-                    Intent intent=new Intent(mContext, NewFriendsMsgActivity.class);
+                    Intent intent = new Intent(mContext, NewFriendsMsgActivity.class);
                     startActivity(intent);
-                }else if(postion==1){
+                } else if (postion == 1) {
                     //跳转到群聊主界面
-                    Intent intent=new Intent(mContext, GroupsActivity.class);
+                    Intent intent = new Intent(mContext, GroupsActivity.class);
                     startActivity(intent);
                 } else {
                     //点击联系人跳转到对应人的聊天界面
-                    Intent intent=new Intent(mContext,ChatActivity.class);
+                    Intent intent = new Intent(mContext, ChatActivity.class);
                     //发送联系人的名称到聊天界面
                     intent.putExtra(Constants.EXTRA_USER_ID,
                             mContactUserList.get(postion).getUserName());
@@ -115,16 +124,16 @@ public class ContactsMainFragment extends SimpleFragment {
             @Override
             public void onLongClick(View view, final int postion) {
                 //屏蔽掉顶端的item栏
-                if(postion>1){
+                if (postion > 1) {
                     //获取对象名
-                    final String username=mContactUserList.get(postion).getUserName();
+                    final String username = mContactUserList.get(postion).getUserName();
                     //创建对话框
-                    final Dialog dialog= DialogUtil.createMyselfDialog(mContext,
+                    final Dialog dialog = DialogUtil.createMyselfDialog(mContext,
                             R.layout.dlg_two,//资源id号
                             Gravity.CENTER);//布局位置
                     //获取布局中的控件对象
-                    TextView mTvDeleteContact= (TextView) dialog.findViewById(R.id.tv_one);
-                    TextView mTvAddToBlackList= (TextView) dialog.findViewById(R.id.tv_two);
+                    TextView mTvDeleteContact = (TextView) dialog.findViewById(R.id.tv_one);
+                    TextView mTvAddToBlackList = (TextView) dialog.findViewById(R.id.tv_two);
                     //为控件设置文本
                     mTvDeleteContact.setText(getString(R.string.Delete_contactUser));
                     mTvAddToBlackList.setText(getString(R.string.Add_to_blackList));
@@ -133,7 +142,7 @@ public class ContactsMainFragment extends SimpleFragment {
                     mTvDeleteContact.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            deleteContact(username,postion);//前者用来删除联系人,后者更新列表
+                            deleteContact(username, postion);//前者用来删除联系人,后者更新列表
                             dialog.dismiss();//记得关闭对话框
                         }
                     });
@@ -148,14 +157,30 @@ public class ContactsMainFragment extends SimpleFragment {
                 }
             }
         });
+
+        /**5-设置索引栏点击监听事件,实现点击字母实现列表栏定位移动*/
+        mSidebar.setTextView(mTvFloatingHeader);//添加中间部分显示控件
+        mSidebar.setOnTouchingLetterChangedListener(new SideBar.OnChooseLetterChangedListener() {
+            @Override
+            public void onChooseLetter(String s) {
+                //这部分后续再实现
+
+            }
+            @Override
+            public void onNoChooseLetter() {
+
+            }
+        });
+
+
     }
 
     //1-删除联系人的方法
-    private void deleteContact(final String username,final int postion){
+    private void deleteContact(final String username, final int postion) {
         //创建加载进度框
-        DialogUtil.createProgressDialog(mContext,null,
+        DialogUtil.createProgressDialog(mContext, null,
                 getString(R.string.Are_delete_with),//正在删除
-                false,false);//对话框无法被取消
+                false, false);//对话框无法被取消
         //开启子线程进行删除操作
         new Thread(new Runnable() {
             @Override
@@ -169,7 +194,7 @@ public class ContactsMainFragment extends SimpleFragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(DialogUtil.isProgressDialogShowing()){
+                            if (DialogUtil.isProgressDialogShowing()) {
                                 DialogUtil.closeProgressDialog();
                             }
                             //刷新列表显示
@@ -185,12 +210,13 @@ public class ContactsMainFragment extends SimpleFragment {
             }
         }).start();
     }
+
     //2-添加到黑名单
-    private void addToBlackList(final String username,final int postion){
+    private void addToBlackList(final String username, final int postion) {
         //创建加载进度框
-        DialogUtil.createProgressDialog(mContext,null,
+        DialogUtil.createProgressDialog(mContext, null,
                 getString(R.string.Are_delete_with),//正在删除
-                false,false);//对话框无法被取消
+                false, false);//对话框无法被取消
         //从服务器获取黑名单列表
         //EMClient.getInstance().contactManager().getBlackListFromServer();
         //从本地db获取黑名单列表
@@ -202,14 +228,14 @@ public class ContactsMainFragment extends SimpleFragment {
                 try {
                     //第二个参数如果为true，则把用户加入到黑名单后双方发消息时对方都收不到；
                     // false，则我能给黑名单的中用户发消息，但是对方发给我时我是收不到的
-                    EMClient.getInstance().contactManager().addUserToBlackList(username,true);
+                    EMClient.getInstance().contactManager().addUserToBlackList(username, true);
                     //本地数据库删除联系人
                     DBManager.deleteContact(username);
                     /*回到主线程进行UI更新*/
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(DialogUtil.isProgressDialogShowing()){
+                            if (DialogUtil.isProgressDialogShowing()) {
                                 DialogUtil.closeProgressDialog();
                             }
                             //刷新列表显示
@@ -234,7 +260,7 @@ public class ContactsMainFragment extends SimpleFragment {
     protected void getContactList() {
         //mContactUserList.clear();
         //先获取本地联系人数据集合
-        contactsMap= DBManager.getContactList();
+        contactsMap = DBManager.getContactList();
         if (contactsMap.isEmpty()) {
             return;
         }

@@ -32,6 +32,10 @@ public class Constants {
     public static final String EXTRA_CHAT_TYPE="group_type";//群聊天类型
     public static final int CHATTYPE_GROUP = 20;//群
     public static final int CHATTYPE_CHATROOM = 30;//聊天室
+    //群组
+    public static final String GROUP_NAME="groupName";//创建群组时的群名称
+    public static final String NEW_MEMBERS="newmembers";//创建群组时邀请的成员集合
+    public static final String GROUP_ID="groupId";//选中群组时传递过来的群ID号
 
 
     //=================REQUEST CODE请求码====================

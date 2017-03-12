@@ -1,15 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <include layout="@layout/include_toolbar"
-             android:id="@+id/toolbar"/>
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/toolbar"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/OverflowMenuStyle">
+        <Button
+            android:id="@+id/btn_save_contacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            style="@style/Widget.AppCompat.ButtonBar"
+            android:textColor="@color/white"
+            android:textSize="16sp"/>
+        <!--style="@style/Widget.AppCompat.ButtonBar"
+            设置按钮的风格为无边界框-->
+    </android.support.v7.widget.Toolbar>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
+        <!--添加列表控件-->
         <!--添加列表控件-->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv"
@@ -17,23 +37,21 @@
             android:layout_height="match_parent">
         </android.support.v7.widget.RecyclerView>
         <!--右侧的导航工具栏-->
-        <com.hyphenate.easeui.widget.EaseSidebar
+        <com.example.achuan.teammanagement.widget.SideBar
             android:id="@+id/sidebar"
             android:layout_width="25dp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:background="@android:color/transparent"
-            android:clickable="true" />
+            android:clickable="true"/>
         <!--首字母导航文本框提示-->
         <TextView
             android:id="@+id/tv_floating_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_centerInParent="true"
             android:background="@drawable/em_show_head_toast_bg"
             android:gravity="center"
-            android:paddingLeft="25dp"
-            android:paddingRight="25dp"
             android:textColor="@android:color/white"
             android:textSize="40sp"
             android:visibility="invisible" />

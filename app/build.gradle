@@ -47,14 +47,16 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
     compile 'com.jakewharton:butterknife:8.2.1'
     /*widget*/
-    compile 'com.victor:lib:1.0.4'
+    //compile 'com.victor:lib:1.0.4'
     //圆形进度条
     /*other*/
     //搜索控件
     compile files('libs/pinyin4j-2.5.0.jar')
     //环信资源Optional compile for GCM (Google Cloud Messaging).
-    compile 'com.google.android.gms:play-services-gcm:9.4.0'
-    compile 'com.hyphenate:hyphenate-sdk:3.2.3'
+    //compile 'com.google.android.gms:play-services-gcm:9.4.0'
+    /*----------因为在EaseUI添加了依赖,这里可以不用了---------*/
+    //compile 'com.hyphenate:hyphenate-sdk:3.2.3'
     //记得去为app添加依赖,教程中没有讲
-    //compile project(':easeui')
+    compile project(':easeui')
+
 }
