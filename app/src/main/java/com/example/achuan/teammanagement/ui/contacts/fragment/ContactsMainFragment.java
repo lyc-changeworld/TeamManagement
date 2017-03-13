@@ -53,6 +53,7 @@ public class ContactsMainFragment extends SimpleFragment {
 
     Context mContext;//上下文操作对象
     ContactAdapter mContactAdapter;//适配器
+    LinearLayoutManager linearlayoutManager;//列表布局管理者
     Map<String, ContactUser> contactsMap;//指向本地联系人集合
     List<ContactUser> mContactUserList;//真正显示在列表中的联系人集合
 
@@ -73,7 +74,9 @@ public class ContactsMainFragment extends SimpleFragment {
         ContactUser topOne = new ContactUser();
         ContactUser topTwo = new ContactUser();
         topOne.setUserName(getString(R.string.new_friends_msg));//申请与通知
+        topOne.setInitialLetter('↑');
         topTwo.setUserName(getString(R.string.group_chat));//群聊
+        topTwo.setInitialLetter('↑');
 
         /**2-对联系人数据进行处理*/
         //先获取本地联系人集合数据
@@ -88,7 +91,7 @@ public class ContactsMainFragment extends SimpleFragment {
         /***3-对列表的布局显示进行设置***/
         //创建联系人列表适配器对象实例
         mContactAdapter = new ContactAdapter(mContext, mContactUserList);
-        LinearLayoutManager linearlayoutManager = new LinearLayoutManager(mContext);
+        linearlayoutManager = new LinearLayoutManager(mContext);
         //设置方向(默认是垂直,下面的是水平设置)
         //linearlayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRv.setLayoutManager(linearlayoutManager);//为列表添加布局
@@ -163,8 +166,14 @@ public class ContactsMainFragment extends SimpleFragment {
         mSidebar.setOnTouchingLetterChangedListener(new SideBar.OnChooseLetterChangedListener() {
             @Override
             public void onChooseLetter(String s) {
-                //这部分后续再实现
-
+                //获取到右边索引栏点击字母对应的item的位置
+                int sectionIndex=getFirstPositionByChar(s.charAt(0));
+                // ==-1代表头字母为s的数据不存在,不执行任何操作
+                if (sectionIndex == -1) {
+                    return;
+                }
+                //列表滚动跳转到指定的位置
+                linearlayoutManager.scrollToPosition(sectionIndex);
             }
             @Override
             public void onNoChooseLetter() {
@@ -173,6 +182,16 @@ public class ContactsMainFragment extends SimpleFragment {
         });
 
 
+    }
+
+    /***根据右边栏点击的字母来实现列表滚动到对应的位置***/
+    public int getFirstPositionByChar(char sign) {
+        for (int i = 0; i < mContactUserList.size(); i++) {
+            if (mContactUserList.get(i).getInitialLetter() == sign) {
+                return i;
+            }
+        }
+        return -1;//-1代表无该字符索引
     }
 
     //1-删除联系人的方法

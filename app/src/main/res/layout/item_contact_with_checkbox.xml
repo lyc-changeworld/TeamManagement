@@ -11,9 +11,11 @@
         android:id="@+id/tv_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ease_mm_listitem_disable"
+        android:background="#E0E0E0"
+        android:paddingBottom="2dp"
         android:paddingLeft="10dp"
-        android:textColor="@android:color/black"
+        android:paddingTop="2dp"
+        android:textColor="#8a99ac"
         android:textSize="15sp"
         android:visibility="gone" />
 
@@ -43,8 +45,8 @@
             android:layout_marginRight="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@android:color/black"
-            android:textSize="20sp"/>
+            android:textColor="#8C8C8C"
+            android:textSize="16sp"/>
         <!--android:ellipsize作用是当文字长度超过textview宽度时的显示方式,
                     当前设置为：省略号显示在结尾-->
     </LinearLayout>

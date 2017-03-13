@@ -27,7 +27,7 @@ public class SideBar extends View {
         this.mTv_hint= mTv_hint;
     }
     /*右侧需要显示的字符以及顺序*/
-    public static String[] letters = {"A", "B", "C", "D", "E", "F", "G", "H",
+    public static String[] letters = {"↑","A", "B", "C", "D", "E", "F", "G", "H",
             "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
             "V", "W", "X", "Y", "Z","#"};
 
@@ -90,7 +90,7 @@ public class SideBar extends View {
                     if (c > -1 && c < letters.length) {
                         onChooseLetterChangedListener.onChooseLetter(letters[c]);
                         choose = c;
-                        invalidate();
+                        invalidate();//作废之前的view,重新绘制
                         //将点击的字母显示在屏幕中间
                         if(mTv_hint!=null){
                             mTv_hint.setText(letters[c]);
@@ -155,5 +155,6 @@ public class SideBar extends View {
         void onChooseLetter(String s);
         void onNoChooseLetter();
     }
+
 
 }

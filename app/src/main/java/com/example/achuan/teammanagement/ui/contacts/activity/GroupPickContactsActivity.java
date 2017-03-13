@@ -58,7 +58,6 @@ public class GroupPickContactsActivity extends SimpleActivity {
      * members already in the group
      */
     private List<String> existMembers;
-    //private boolean[] isCheckedArray;//记录item是否被选中
 
     List<ContactUser> mContactUserList;//本地联系人集合
     LinearLayoutManager linearlayoutManager;
@@ -121,8 +120,14 @@ public class GroupPickContactsActivity extends SimpleActivity {
         mSidebar.setOnTouchingLetterChangedListener(new SideBar.OnChooseLetterChangedListener() {
             @Override
             public void onChooseLetter(String s) {
-                //这部分后续再实现
-
+                //获取到右边索引栏点击字母对应的item的位置
+                int sectionIndex=getFirstPositionByChar(s.charAt(0));
+                // ==-1代表头字母为s的数据不存在,不执行任何操作
+                if (sectionIndex == -1) {
+                    return;
+                }
+                //列表滚动跳转到指定的位置
+                linearlayoutManager.scrollToPosition(sectionIndex);
             }
             @Override
             public void onNoChooseLetter() {
@@ -132,7 +137,7 @@ public class GroupPickContactsActivity extends SimpleActivity {
     }
 
 
-    /*获取选中联系人名称集合的方法*/
+    /*1-获取选中联系人名称集合的方法*/
     private List<String> getToBeAddMembers() {
         List<String> members = new ArrayList<String>();
         int length = mPickContactAdapter.getIsCheckedArray().length;
@@ -145,7 +150,7 @@ public class GroupPickContactsActivity extends SimpleActivity {
         return members;
     }
 
-    //保存选中的联系人的方法
+    //2-保存选中的联系人的方法
     private void save() {
         List<String> var = getToBeAddMembers();
         /*for (int i = 0; i <var.size() ; i++) {
@@ -156,6 +161,17 @@ public class GroupPickContactsActivity extends SimpleActivity {
         intent.putExtra(Constants.NEW_MEMBERS,var.toArray(new String[var.size()]));
         setResult(RESULT_OK, intent);
         finish();
+    }
+
+    /**这部分代码在联系人界面有重复,后面将优化*/
+    /*3-根据右边栏点击的字母来实现列表滚动到对应的位置***/
+    public int getFirstPositionByChar(char sign) {
+        for (int i = 0; i < mContactUserList.size(); i++) {
+            if (mContactUserList.get(i).getInitialLetter() == sign) {
+                return i;
+            }
+        }
+        return -1;//-1代表无该字符索引
     }
 
     @OnClick({R.id.btn_save_contacts})

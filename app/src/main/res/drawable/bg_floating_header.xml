@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--功能：悬浮首字母显示的view的背景效果-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--设置圆角的曲度-->
+    <corners android:radius="5dp"></corners>
+    <!--设置填充颜色-->
+    <solid android:color="#9C9C9C"></solid>
+    <!--设置边框的颜色和宽度-->
+    <!--<stroke android:color="#00BFFF"
+        android:width="1dp"></stroke>-->
+    <!--#4b0e0e0e-->
+</shape>
