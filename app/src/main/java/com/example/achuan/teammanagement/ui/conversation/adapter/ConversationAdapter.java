@@ -1,4 +1,4 @@
-package com.example.achuan.teammanagement.ui.news.adapter;
+package com.example.achuan.teammanagement.ui.conversation.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.achuan.teammanagement.R;
+import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.util.DateUtils;
@@ -25,7 +26,6 @@ import butterknife.ButterKnife;
  * 消息列表的适配器类
  */
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ViewHolder> {
-
 
     private LayoutInflater mInflater;//创建布局装载对象来获取相关控件（类似于findViewById()）
     private Context mContext;//显示框面
@@ -94,12 +94,20 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
         /*1-设置头像图标*/
         if(conversation.isGroup()){
-            holder.mIvAvatar.setImageResource(R.drawable.em_group_icon);
-        }else {
+            //群聊
+            if (conversation.getType() == EMConversation.EMConversationType.GroupChat) {
+                holder.mIvAvatar.setImageResource(R.drawable.em_group_icon);
+                username = EMClient.getInstance().groupManager().
+                        getGroup(username).getGroupName();
+            }
+        }else{
+            //单聊
             holder.mIvAvatar.setImageResource(R.drawable.default_avatar);
         }
+
         /*2-设置聊天对象名称*/
-        holder.mTvName.setText("与 " + username + " 的会话");
+        holder.mTvName.setText(username);
+
         /*3-设置未读消息数*/
         if (conversation.getUnreadMsgCount() > 0) {
             // 显示与此用户的消息未读数
@@ -150,37 +158,18 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     /*创建自定义的ViewHolder类*/
     public static class ViewHolder extends RecyclerView.ViewHolder {
         //使用butterknife来进行item中的控件加载,此处需要自己添加
-        @BindView(R.id.tv_unread_msg_number)
-        TextView mTvUnreadMsgNumber;
-        /**
-         * 消息未读数
-         */
-        @BindView(R.id.tv_name)
-        TextView mTvName;
-        /**
-         * 和谁的聊天记录
-         */
-        @BindView(R.id.tv_time)
-        TextView mTvTime;
-        /**
-         * 最后一条消息的时间
-         */
-        @BindView(R.id.tv_msg_state)
-        ImageView mTvMsgState;
-        /**
-         * 最后一条消息的发送状态
-         */
-        @BindView(R.id.tv_message)
-        TextView mTvMessage;
-
-        /**
-         * 最后一条消息的内容
-         */
         @BindView(R.id.iv_avatar)
         ImageView mIvAvatar;
-        /*
-        * 头像
-        * */
+        @BindView(R.id.tv_unread_msg_number)
+        TextView mTvUnreadMsgNumber;
+        @BindView(R.id.tv_msg_state)
+        ImageView mTvMsgState;
+        @BindView(R.id.tv_name)
+        TextView mTvName;
+        @BindView(R.id.tv_time)
+        TextView mTvTime;
+        @BindView(R.id.tv_message)
+        TextView mTvMessage;
         ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);

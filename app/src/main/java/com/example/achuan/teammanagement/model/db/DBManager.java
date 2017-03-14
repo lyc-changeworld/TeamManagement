@@ -1,7 +1,5 @@
 package com.example.achuan.teammanagement.model.db;
 
-import com.example.achuan.teammanagement.util.StringUtil;
-
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
@@ -80,10 +78,9 @@ public class DBManager {
         contactUser.setNick(user.getNick());
         contactUser.setAvatar(user.getAvatar());
         //设置首字母
-        contactUser.setInitialLetter(
-                StringUtil.getHeadChar(contactUser.getUserName()));
+        contactUser.setInitialLetter(user.getInitialLetter());
         //调用该方法避免重复添加联系人
-        contactUser.saveIfNotExist("userName=?",contactUser.getUserName());
+        contactUser.saveIfNotExist("userName=?",user.getUserName());
     }
 
     /**
@@ -94,18 +91,16 @@ public class DBManager {
         //存储联系人之前清空联系人表
         DataSupport.deleteAll(ContactUser.class);
         //轮询存储用户人
-        for (ContactUser contactUser:contactList){
-            ContactUser user=new ContactUser();
-            user.setId(contactUser.getId());
-            user.setUserName(contactUser.getUserName());
-            user.setNick(contactUser.getNick());
-            user.setAvatar(contactUser.getAvatar());
-            //设置首字母
-            contactUser.setInitialLetter(
-                    StringUtil.getHeadChar(contactUser.getUserName()));
+        for (ContactUser user:contactList){
+            ContactUser contactUser=new ContactUser();
+            contactUser.setId(user.getId());
+            contactUser.setUserName(user.getUserName());
+            contactUser.setNick(user.getNick());
+            contactUser.setAvatar(user.getAvatar());
+            contactUser.setInitialLetter(user.getInitialLetter());
             //user.save();
             //调用该方法避免重复添加联系人
-            user.saveIfNotExist("userName=?",contactUser.getUserName());
+            contactUser.saveIfNotExist("userName=?",user.getUserName());
         }
     }
 
@@ -117,8 +112,7 @@ public class DBManager {
         //这里使用了Map集合:<key值,2.value值>
         Map<String, ContactUser> users = new Hashtable<String, ContactUser>();
         /*---查询表格中的所有数据---*/
-        List<ContactUser> contactUsers = new ArrayList<ContactUser>();
-        contactUsers= DataSupport.findAll(ContactUser.class);
+        List<ContactUser> contactUsers= DataSupport.findAll(ContactUser.class);
         //轮询查询数据
         for (ContactUser user:contactUsers){
             users.put(user.getUserName(),user);

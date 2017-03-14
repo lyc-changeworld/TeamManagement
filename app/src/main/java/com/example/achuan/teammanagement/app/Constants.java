@@ -27,20 +27,22 @@ public class Constants {
 
     //=================环信即时通讯相关====================
     //聊天消息的类型
+    public static final String EXTRA_CHAT_TYPE="chatType";//当前会话的类型(单聊\群聊)
     public static final String EXTRA_USER_ID="userId";//单人聊天的名称
     public static final int CHATTYPE_SINGLE = 10;//单人
-    public static final String EXTRA_CHAT_TYPE="group_type";//群聊天类型
+    //public static final String EXTRA_CHAT_TYPE="group_type";//群聊天类型
     public static final int CHATTYPE_GROUP = 20;//群
+    public static final String EXTRA_GROUP_ID="groupId";//选中群组时传递过来的群ID号
     public static final int CHATTYPE_CHATROOM = 30;//聊天室
-    //群组
+    //创建群组
     public static final String GROUP_NAME="groupName";//创建群组时的群名称
     public static final String NEW_MEMBERS="newmembers";//创建群组时邀请的成员集合
-    public static final String GROUP_ID="groupId";//选中群组时传递过来的群ID号
 
 
     //=================REQUEST CODE请求码====================
     public static final int GROUP_PICK_CONTACTS_REQUEST_CODE=0;
-
+    public static final int NEW_GROUP_REQUEST_CODE=1;
+    public static final int CHAT_REQUEST_CODE=2;
 
     //=================OTHER STRING====================
 

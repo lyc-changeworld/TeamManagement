@@ -18,6 +18,8 @@ import com.example.achuan.teammanagement.model.db.ContactUser;
 import com.example.achuan.teammanagement.model.db.DBManager;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
+import com.example.achuan.teammanagement.util.SnackbarUtil;
+import com.example.achuan.teammanagement.util.StringUtil;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
@@ -37,7 +39,7 @@ import butterknife.OnClick;
 
 /**
  * Created by achuan on 17-2-27.
- * 功能：
+ * 功能：登录界面的逻辑功能
  */
 
 public class LoginActivity extends SimpleActivity {
@@ -63,8 +65,6 @@ public class LoginActivity extends SimpleActivity {
 
     /*对应EditText控件中输入字符的引用变量*/
     String userName, password;
-
-    private boolean progressShow;
 
     @Override
     protected int getLayout() {
@@ -119,6 +119,7 @@ public class LoginActivity extends SimpleActivity {
                 loginDeal();//登录处理
                 break;
             case R.id.tv_forgetPassword://忘记密码
+                SnackbarUtil.showShort(view,"该功能还未实现...");
                 break;
             case R.id.tv_newUser://新用户注册
                 Intent intent = new Intent(this, RegisterActivity.class);
@@ -128,6 +129,7 @@ public class LoginActivity extends SimpleActivity {
         }
     }
 
+    /**1-登录的处理方法*/
     private void loginDeal() {
         userName = mEtUsername.getText().toString().trim();//用户名
         password = mEtPassword.getText().toString().trim();//密码
@@ -164,12 +166,12 @@ public class LoginActivity extends SimpleActivity {
                                 //切换回litepal.xml中指定的默认数据库
                                 //LitePal.useDefault();
 
-
                                 //提示登录成功
                                 Toast.makeText(getApplicationContext(),
                                         getString(R.string.Login_successfully),
                                         Toast.LENGTH_SHORT).show();
-                                // ** 第一次登录或者之前logout后再登录,加载所有本地群和回话
+
+                                // ** 第一次登录或者之前logout后再登录,加载所有本地群和会话
                                 // ** manually load all local groups and
                                 EMClient.getInstance().groupManager().loadAllGroups();
                                 EMClient.getInstance().chatManager().loadAllConversations();
@@ -230,25 +232,33 @@ public class LoginActivity extends SimpleActivity {
         }).start();
     }
 
-    /*获取好友列表,并存储到本地数据库中*/
+    /**2-获取好友列表,并存储到本地数据库中*/
     private  void  getFriends(){
-        try {
-            //获取网络端的所有好友列表
-            List<String> usernames = EMClient.getInstance().contactManager().
-                    getAllContactsFromServer();
-            Map<String ,ContactUser> users=new HashMap<String ,ContactUser>();
-            for(String username:usernames){
-                ContactUser user=new ContactUser();
-                user.setUserName(username);
-                users.put(username, user);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //获取网络端的所有好友列表
+                    List<String> usernames = EMClient.getInstance().contactManager().
+                            getAllContactsFromServer();
+                    Map<String ,ContactUser> users=new HashMap<String ,ContactUser>();
+                    for(String username:usernames){
+                        //测试打印当前用户的联系人的名称
+                        //LogUtil.d(TAG,username);
+                        ContactUser user=new ContactUser();
+                        user.setUserName(username);
+                        //设置首字母
+                        user.setInitialLetter(StringUtil.getHeadChar(username));
+                        users.put(username, user);
+                    }
+                    //保存联系人到本地数据库
+                    DBManager.saveContactList(new ArrayList<ContactUser>(users.values()));
+                } catch (HyphenateException e) {
+                    e.printStackTrace();
+                }
             }
-            //保存联系人到本地数据库
-            DBManager.saveContactList(new ArrayList<ContactUser>(users.values()));
-        } catch (HyphenateException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

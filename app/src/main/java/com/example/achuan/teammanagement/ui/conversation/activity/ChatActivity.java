@@ -1,4 +1,4 @@
-package com.example.achuan.teammanagement.ui.news.activity;
+package com.example.achuan.teammanagement.ui.conversation.activity;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -20,11 +20,12 @@ import com.example.achuan.teammanagement.EaseCommonUtils;
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleActivity;
-import com.example.achuan.teammanagement.ui.news.adapter.ChatMessageAdapter;
+import com.example.achuan.teammanagement.ui.conversation.adapter.ChatMessageAdapter;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMGroup;
 import com.hyphenate.chat.EMMessage;
 
 import java.util.List;
@@ -46,6 +47,7 @@ import static com.example.achuan.teammanagement.R.id.et_content;
 
 public class ChatActivity extends SimpleActivity {
 
+    public static final String TAG="ChatActivity";
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -58,7 +60,8 @@ public class ChatActivity extends SimpleActivity {
     @BindView(R.id.sw_rf)
     SwipeRefreshLayout mSwRf;
 
-    private int chatType = 1;
+    private int chatType =Constants.CHATTYPE_SINGLE;//默认为单聊
+
     private String toChatUsername;//聊天对象名称
     private List<EMMessage> mEMMessageList;//聊天记录集合
     private EMConversation mEMConversation;
@@ -69,6 +72,7 @@ public class ChatActivity extends SimpleActivity {
     Context mContext;
     LinearLayoutManager linearlayoutManager;
     ChatMessageAdapter mChatMessageAdapter;
+    EMGroup mEMGroup;//群聊情况的对象引用变量
 
 
     @Override
@@ -79,10 +83,26 @@ public class ChatActivity extends SimpleActivity {
     @Override
     protected void initEventAndData() {
         mContext=this;
-        /*1-获取到当前聊天的联系人的名称*/
-        toChatUsername = this.getIntent().getStringExtra(Constants.EXTRA_USER_ID);
-        //设置标题工具栏
-        setToolBar(mToolbar, toChatUsername, true);
+
+        /**1-获取到当前聊天的联系人的名称*/
+        //判断当前为群聊还是单聊
+        chatType=getIntent().getIntExtra(Constants.EXTRA_CHAT_TYPE,Constants.CHATTYPE_SINGLE);
+        if(chatType==Constants.CHATTYPE_SINGLE){
+            //单聊,获取对方用户名称
+            toChatUsername = getIntent().getStringExtra(Constants.EXTRA_USER_ID);
+            //设置标题工具栏
+            setToolBar(mToolbar, toChatUsername, true);
+            //LogUtil.d(TAG,"当前为单聊："+toChatUsername);
+        }else if(chatType==Constants.CHATTYPE_GROUP){
+            //群聊,获取群组ID号
+            toChatUsername = getIntent().getStringExtra(Constants.EXTRA_GROUP_ID);
+            //group chat
+            mEMGroup= EMClient.getInstance().groupManager().getGroup(toChatUsername);
+            //设置标题工具栏
+            setToolBar(mToolbar, mEMGroup.getGroupName(), true);
+            //LogUtil.d(TAG,"当前为群聊："+mEMGroup.getGroupName());
+        }
+
         /***2-为Edit输入框添加输入监听类,实现合理的效果***/
         //对只有在用户名和密码的输入都不为空的情况下，button按钮才显示有效，
         // 可以自己构造一个TextChange的类，实现一个TextWatcher接口，
@@ -117,7 +137,6 @@ public class ChatActivity extends SimpleActivity {
         mChatMessageAdapter.setContentOnLongClickListener(new ChatMessageAdapter.ContentOnLongClickListener() {
             @Override
             public void onLongClick(View view, final int postion) {
-
                 //final EMMessage emMessage=mEMMessageList.get(postion);
                 //创建对话框
                 final Dialog dialog= DialogUtil.createMyselfDialog(ChatActivity.this,
@@ -330,10 +349,14 @@ public class ChatActivity extends SimpleActivity {
 
     /*1-初始化加载对话消息的方法*/
     private void initMessage() {
-        // 获取当前聊天对象的会话对象
+        // 初始化获取当前聊天对象的会话对象
         mEMConversation = EMClient.getInstance().chatManager().getConversation(
                 toChatUsername,//聊天对象
                 EaseCommonUtils.getConversationType(chatType), true);
+
+        /**
+         * 注意：第一个参数(群聊时传递的是getGroupId()--id号,单聊时是--用户名)
+         * */
 
         // 初始化db时，每个conversation加载数目是getChatOptions().getNumberOfMessagesLoaded
         // 这个数目如果比用户期望进入会话界面时显示的个数不一样，就多加载一些

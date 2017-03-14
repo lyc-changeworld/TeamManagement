@@ -1,4 +1,4 @@
-package com.example.achuan.teammanagement.ui.news.adapter;
+package com.example.achuan.teammanagement.ui.conversation.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -91,9 +91,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     public ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
         //根据类别加载不同的消息布局
         View view;
-        if (type == 0) {
+        if (type == 0) {//别人发的
             view = mInflater.inflate(R.layout.item_message_received, parent, false);
-        } else {
+        } else {//发给别人的
             view = mInflater.inflate(R.layout.item_message_sent, parent, false);
         }
         ViewHolder viewHolder = new ViewHolder(view);//创建一个item的viewHoler实例

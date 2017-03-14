@@ -1,4 +1,4 @@
-package com.example.achuan.teammanagement.ui.news.fragment;
+package com.example.achuan.teammanagement.ui.conversation.fragment;
 
 
 import android.app.Dialog;
@@ -18,8 +18,8 @@ import android.widget.Toast;
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleFragment;
-import com.example.achuan.teammanagement.ui.news.activity.ChatActivity;
-import com.example.achuan.teammanagement.ui.news.adapter.ConversationAdapter;
+import com.example.achuan.teammanagement.ui.conversation.activity.ChatActivity;
+import com.example.achuan.teammanagement.ui.conversation.adapter.ConversationAdapter;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
@@ -38,10 +38,10 @@ import butterknife.ButterKnife;
 
 /**
  * Created by achuan on 17-2-1.
- * 功能：
+ * 功能：会话消息界面
  */
 
-public class NewsMainFragment extends SimpleFragment {
+public class ConversationMainFragment extends SimpleFragment {
 
     @BindView(R.id.rv)
     RecyclerView mRv;
@@ -84,8 +84,9 @@ public class NewsMainFragment extends SimpleFragment {
             @Override
             public void onClick(View view, int postion) {
                 EMConversation conversation = mEMConversationList.get(postion);
-                //获取到会话的对象名称
+                //获取信息：单聊时为用户名称,群聊时为群组的id号
                 String username = conversation.conversationId();
+
                 //不能和自己聊天哟
                 if (username.equals(SharedPreferenceUtil.getCurrentUserName()))
                     //提示:不能和自己聊
@@ -94,17 +95,20 @@ public class NewsMainFragment extends SimpleFragment {
                 else {
                     // 进入聊天页面
                     Intent intent = new Intent(mContext, ChatActivity.class);
-                    //如果是群聊天
                     if(conversation.isGroup()){
-                        if(conversation.getType() == EMConversation.EMConversationType.ChatRoom){
-                            // it's group chat
-                            intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_CHATROOM);
-                        }else{
+                        //如果是群聊天
+                        if(conversation.getType() == EMConversation.EMConversationType.GroupChat){
+                            //传递信息,说明该为群聊
                             intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_GROUP);
+                            //群聊发送群组的id号过去
+                            intent.putExtra(Constants.EXTRA_GROUP_ID, username);
                         }
+                    }else {
+                        //传递信息,说明该为单聊
+                        intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_SINGLE);
+                        //单聊发送用户名称过去
+                        intent.putExtra(Constants.EXTRA_USER_ID, username);
                     }
-                    // it's single chat
-                    intent.putExtra(Constants.EXTRA_USER_ID, username);
                     startActivity(intent);
                 }
             }

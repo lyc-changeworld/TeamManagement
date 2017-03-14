@@ -189,12 +189,12 @@ public class EaseCommonUtils {
 	 * @return
 	 */
 	public static EMConversationType getConversationType(int chatType) {
-		if (chatType == Constants.CHATTYPE_SINGLE) {
-			return EMConversationType.Chat;
-		} else if (chatType == Constants.CHATTYPE_GROUP) {
+		if (chatType == Constants.CHATTYPE_GROUP) {
 			return EMConversationType.GroupChat;
-		} else {
+		} else if(chatType==Constants.CHATTYPE_CHATROOM){
 			return EMConversationType.ChatRoom;
+		}else {
+			return EMConversationType.Chat;//默认为单聊
 		}
 	}
 

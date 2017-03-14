@@ -18,10 +18,11 @@ import com.example.achuan.teammanagement.model.db.ContactUser;
 import com.example.achuan.teammanagement.model.db.DBManager;
 import com.example.achuan.teammanagement.model.db.InviteMessage;
 import com.example.achuan.teammanagement.ui.contacts.fragment.ContactsMainFragment;
+import com.example.achuan.teammanagement.ui.conversation.fragment.ConversationMainFragment;
 import com.example.achuan.teammanagement.ui.explore.fragment.ExploreMainFragment;
 import com.example.achuan.teammanagement.ui.myself.fragment.MyselfMainFragment;
-import com.example.achuan.teammanagement.ui.news.fragment.NewsMainFragment;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
+import com.example.achuan.teammanagement.util.StringUtil;
 import com.example.achuan.teammanagement.util.SystemUtil;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
@@ -37,7 +38,7 @@ import static com.example.achuan.teammanagement.model.db.DBManager.deleteMessage
 public class MainActivity extends SimpleActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     //需要装载到主活动中的Fragment的引用变量
-    NewsMainFragment mNewsMainFragment;
+    ConversationMainFragment mNewsMainFragment;
     ContactsMainFragment mContactsMainFragment;
     ExploreMainFragment mExploreMainFragment;
     MyselfMainFragment mMyselfMainFragment;
@@ -75,18 +76,21 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         mLastMenuItem.setChecked(true);
         //添加点击监听事件
         mBtmNav.setOnNavigationItemSelectedListener(this);
+
         /***2-初始化创建模块的fragment实例对象,并装载到主布局中****/
         //初始化toolbar
         setToolBar(mToolbar, (String) mLastMenuItem.getTitle(),false);
         //mToolbar.setLogo(R.drawable.logo);//设置logo
         //默认先创建第一界面
-        mNewsMainFragment = new NewsMainFragment();
+        mNewsMainFragment = new ConversationMainFragment();
         //并将第一界面碎片添加到布局容器中
         replaceFragment(contentViewId, getTargetFragment(showFragment));
         SharedPreferenceUtil.setCurrentItem(showFragment);
+
         /***3-注册联系人变动监听***/
         mEMContactListener=new MyContactListener();
         EMClient.getInstance().contactManager().setContactListener(mEMContactListener);
+
     }
 
     /***
@@ -104,6 +108,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
                 //创建实例对象
                 ContactUser user = new ContactUser();
                 user.setUserName(username);
+                user.setInitialLetter(StringUtil.getHeadChar(username));
                 //进行查询操作,避免重复添加
                 DBManager.saveContact(user);
             }
@@ -267,7 +272,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
                 showFragment = Constants.TYPE_NEWS;
                 //第一次加载显示时,才创建碎片对象,并添加到内容容器中
                 if (mNewsMainFragment == null) {
-                    mNewsMainFragment = new NewsMainFragment();
+                    mNewsMainFragment = new ConversationMainFragment();
                     addFragment(contentViewId, mNewsMainFragment);
                 }
                 break;

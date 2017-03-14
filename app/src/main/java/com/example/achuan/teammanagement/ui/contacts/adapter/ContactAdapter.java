@@ -86,8 +86,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         ContactUser contactUser = mContactUserList.get(postion);
 
 
-        //设置用户名
+        //1-设置用户名
         holder.mTvName.setText(contactUser.getUserName());
+
         //设置头像
         if (postion == 0) {
             //最顶上的是申请和通知的栏(单栏)

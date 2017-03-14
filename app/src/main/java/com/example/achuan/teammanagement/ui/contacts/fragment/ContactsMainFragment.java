@@ -20,7 +20,7 @@ import com.example.achuan.teammanagement.model.db.DBManager;
 import com.example.achuan.teammanagement.ui.contacts.activity.GroupsActivity;
 import com.example.achuan.teammanagement.ui.contacts.activity.NewFriendsMsgActivity;
 import com.example.achuan.teammanagement.ui.contacts.adapter.ContactAdapter;
-import com.example.achuan.teammanagement.ui.news.activity.ChatActivity;
+import com.example.achuan.teammanagement.ui.conversation.activity.ChatActivity;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
 import com.example.achuan.teammanagement.widget.SideBar;
@@ -115,6 +115,8 @@ public class ContactsMainFragment extends SimpleFragment {
                 } else {
                     //点击联系人跳转到对应人的聊天界面
                     Intent intent = new Intent(mContext, ChatActivity.class);
+                    //传递信息,说明该为单聊
+                    intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_SINGLE);
                     //发送联系人的名称到聊天界面
                     intent.putExtra(Constants.EXTRA_USER_ID,
                             mContactUserList.get(postion).getUserName());

@@ -50,7 +50,7 @@
         <!--申请与通知消息界面-->
         <activity android:name=".ui.contacts.activity.NewFriendsMsgActivity"></activity>
         <!--聊天界面-->
-        <activity android:name=".ui.news.activity.ChatActivity"
+        <activity android:name=".ui.conversation.activity.ChatActivity"
                   android:screenOrientation="portrait"
                   android:windowSoftInputMode="adjustResize|stateHidden|stateUnchanged">
             <!--对于没有滚动控件的布局来说，采用的是adjustPan方式，

@@ -75,7 +75,7 @@ public class GroupPickContactsActivity extends SimpleActivity {
         mBtnSaveContacts.setText(R.string.save);//设置标题中右侧按钮的文本
         /**1-初始化判断是否为创建新群组*/
         //获取传递过来的群ID号,没有就说明是刚创建群
-        String groupId = getIntent().getStringExtra(Constants.GROUP_ID);
+        String groupId = getIntent().getStringExtra(Constants.EXTRA_GROUP_ID);
         if (groupId == null) {// create new group
             isCreatingNewGroup = true;
         } else {

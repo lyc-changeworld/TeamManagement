@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--功能：群组列表中item的布局设计-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@drawable/bg_item"
+    android:gravity="center_vertical" >
+
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="4dp"
+        android:padding="5dp"
+        android:src="@drawable/em_group_icon" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="7dp"
+        android:layout_toRightOf="@id/iv_avatar"
+        android:textColor="#8C8C8C"
+        android:textSize="16sp" />
+
+</RelativeLayout>
