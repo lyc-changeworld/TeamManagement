@@ -196,7 +196,7 @@ public class ContactsMainFragment extends SimpleFragment {
         return -1;//-1代表无该字符索引
     }
 
-    //1-删除联系人的方法
+    /*1-删除联系人的方法*/
     private void deleteContact(final String username, final int postion) {
         //创建加载进度框
         DialogUtil.createProgressDialog(mContext, null,
@@ -232,52 +232,8 @@ public class ContactsMainFragment extends SimpleFragment {
         }).start();
     }
 
-    //2-添加到黑名单
-    private void addToBlackList(final String username, final int postion) {
-        //创建加载进度框
-        DialogUtil.createProgressDialog(mContext, null,
-                getString(R.string.Are_delete_with),//正在删除
-                false, false);//对话框无法被取消
-        //从服务器获取黑名单列表
-        //EMClient.getInstance().contactManager().getBlackListFromServer();
-        //从本地db获取黑名单列表
-        //EMClient.getInstance().contactManager().getBlackListUsernames();
-        //开启子线程进行操作
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //第二个参数如果为true，则把用户加入到黑名单后双方发消息时对方都收不到；
-                    // false，则我能给黑名单的中用户发消息，但是对方发给我时我是收不到的
-                    EMClient.getInstance().contactManager().addUserToBlackList(username, true);
-                    //本地数据库删除联系人
-                    DBManager.deleteContact(username);
-                    /*回到主线程进行UI更新*/
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (DialogUtil.isProgressDialogShowing()) {
-                                DialogUtil.closeProgressDialog();
-                            }
-                            //刷新列表显示
-                            mContactUserList.remove(postion);
-                            //调用下面的方法进行数据刷新比较保险,
-                            //之前用notifyItemRemoved(postion)时出现了数据更新不及时的情况
-                            mContactAdapter.notifyDataSetChanged();
-                        }
-                    });
-                } catch (HyphenateException e) {
-                    e.printStackTrace();
-                }
 
-            }
-        }).start();
-    }
-
-
-    /**
-     * 获取联系人列表，并过滤掉黑名单和排序
-     */
+    /*获取联系人列表，并过滤掉黑名单和排序*/
     protected void getContactList() {
         //mContactUserList.clear();
         //先获取本地联系人数据集合
@@ -330,6 +286,47 @@ public class ContactsMainFragment extends SimpleFragment {
         });*/
     }
 
+    /*添加到黑名单*/
+    private void addToBlackList(final String username, final int postion) {
+        //创建加载进度框
+        DialogUtil.createProgressDialog(mContext, null,
+                getString(R.string.Are_delete_with),//正在删除
+                false, false);//对话框无法被取消
+        //从服务器获取黑名单列表
+        //EMClient.getInstance().contactManager().getBlackListFromServer();
+        //从本地db获取黑名单列表
+        //EMClient.getInstance().contactManager().getBlackListUsernames();
+        //开启子线程进行操作
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //第二个参数如果为true，则把用户加入到黑名单后双方发消息时对方都收不到；
+                    // false，则我能给黑名单的中用户发消息，但是对方发给我时我是收不到的
+                    EMClient.getInstance().contactManager().addUserToBlackList(username, true);
+                    //本地数据库删除联系人
+                    DBManager.deleteContact(username);
+                    /*回到主线程进行UI更新*/
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (DialogUtil.isProgressDialogShowing()) {
+                                DialogUtil.closeProgressDialog();
+                            }
+                            //刷新列表显示
+                            mContactUserList.remove(postion);
+                            //调用下面的方法进行数据刷新比较保险,
+                            //之前用notifyItemRemoved(postion)时出现了数据更新不及时的情况
+                            mContactAdapter.notifyDataSetChanged();
+                        }
+                    });
+                } catch (HyphenateException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

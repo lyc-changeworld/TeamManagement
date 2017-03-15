@@ -9,7 +9,7 @@ import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleActivity;
 import com.example.achuan.teammanagement.model.db.DBManager;
 import com.example.achuan.teammanagement.model.db.InviteMessage;
-import com.example.achuan.teammanagement.ui.main.adapter.NewFriendsMsgAdapter;
+import com.example.achuan.teammanagement.ui.contacts.adapter.NewFriendsMsgAdapter;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
 
 import java.util.List;

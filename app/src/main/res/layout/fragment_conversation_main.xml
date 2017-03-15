@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--功能:-->
+<!--功能:会话界面的布局设计-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--添加一个网络状态的view块,实现实时的网络诊断提示
+        默认为不显示不占位-->
+    <FrameLayout
+        android:id="@+id/fl_error_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+    </FrameLayout>
+
     <!--添加列表控件-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv"

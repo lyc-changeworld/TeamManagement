@@ -76,12 +76,17 @@
     <string name="Has_refused_to">已拒绝</string>
     <string name="Agree_with_failure">同意失败:</string>
     <string name="Refuse_with_failure">拒绝失败:</string>
+    <string name="Apply_to_the_group_of">申请加入群：</string>
+    <string name="accept_join_group">同意加入群：</string>
+    <string name="refuse_join_group">拒绝加入群：</string>
 
     <!--7-会话\聊天\联系人-->
     <string name="Are_delete_with">正在删除...</string>
     <string name="Are_add_to">正在移入...</string>
     <string name="Are_remove_from">正在移除...</string>
     <!--会话列表界面-->
+    <string name="can_not_connect_chat_server_connection">连接不到聊天服务器</string>
+    <string name="the_current_network">当前网络不可用，请检查网络设置</string>
     <string name="Delete_conversation">删除会话</string>
     <string name="Delete_conversation_and_data">删除会话和消息</string>
     <string name="Cant_chat_with_yourself">不能和自己聊天</string>

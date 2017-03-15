@@ -102,7 +102,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             }
         }else{
             //单聊
-            holder.mIvAvatar.setImageResource(R.drawable.default_avatar);
+            holder.mIvAvatar.setImageResource(R.drawable.em_default_avatar);
         }
 
         /*2-设置聊天对象名称*/

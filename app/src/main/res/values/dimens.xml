@@ -3,6 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="height_row_weixin">59dp</dimen>
+
     <dimen name="size_avatar">50dp</dimen>
     <dimen name="margin_chat_activity">5dp</dimen>
 </resources>

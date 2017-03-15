@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,8 +23,11 @@ import com.example.achuan.teammanagement.ui.conversation.activity.ChatActivity;
 import com.example.achuan.teammanagement.ui.conversation.adapter.ConversationAdapter;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
+import com.example.achuan.teammanagement.util.SystemUtil;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
+import com.hyphenate.EMConnectionListener;
 import com.hyphenate.EMConversationListener;
+import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 
@@ -45,30 +49,51 @@ public class ConversationMainFragment extends SimpleFragment {
 
     @BindView(R.id.rv)
     RecyclerView mRv;
+    @BindView(R.id.fl_error_item)
+    FrameLayout mFlErrorItem;//连接错误提示栏
 
-    Context mContext;
+    TextView mTvConnectErrormsg;//异常提醒文本
+
+    Context mContext;//上下文引用变量
+
     private List<EMConversation> mEMConversationList;
     LinearLayoutManager linearlayoutManager;
     ConversationAdapter mConversationAdapter;
 
+    protected boolean hidden;//记录挡住的状态
+    EMConversationListener mEMConversationListener;
+    EMConnectionListener mEMConnectionListener;
+
     @Override
     protected int getLayoutId() {
-        return R.layout.fragment_news_main;
+        return R.layout.fragment_conversation_main;
     }
 
     @Override
     protected void initEventAndData() {
-        mContext=getActivity();//获取到上下文对象
+        mContext = getActivity();//获取到上下文对象
+
+        //加载外部的布局文件,然后添加到当前布局中来
+        View errorView = View.inflate(getActivity(), R.layout.item_chat_neterror, null);
+        mFlErrorItem.addView(errorView);
+        mTvConnectErrormsg = (TextView) errorView.findViewById(R.id.tv_connect_errormsg);
+        /*点击错误提示,后将跳转到网络设置界面*/
+        errorView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SystemUtil.setNetWork(mContext);
+            }
+        });
 
         /*1-初始化加载会话集合*/
         //创建会话集合体对象
-        mEMConversationList=new ArrayList<EMConversation>();
+        mEMConversationList = new ArrayList<EMConversation>();
         /*//获取到排好序的会话对象集合
         mEMConversationList.addAll(loadConversationList());*/
 
         /***2-列表适配及布局初始化的设置***/
         //创建适配器对象
-        mConversationAdapter=new ConversationAdapter(mContext,mEMConversationList);
+        mConversationAdapter = new ConversationAdapter(mContext, mEMConversationList);
         //对列表的布局显示进行设置
         linearlayoutManager = new LinearLayoutManager(mContext);
         //设置方向(默认是垂直,下面的是水平设置)
@@ -95,15 +120,15 @@ public class ConversationMainFragment extends SimpleFragment {
                 else {
                     // 进入聊天页面
                     Intent intent = new Intent(mContext, ChatActivity.class);
-                    if(conversation.isGroup()){
+                    if (conversation.isGroup()) {
                         //如果是群聊天
-                        if(conversation.getType() == EMConversation.EMConversationType.GroupChat){
+                        if (conversation.getType() == EMConversation.EMConversationType.GroupChat) {
                             //传递信息,说明该为群聊
                             intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_GROUP);
                             //群聊发送群组的id号过去
                             intent.putExtra(Constants.EXTRA_GROUP_ID, username);
                         }
-                    }else {
+                    } else {
                         //传递信息,说明该为单聊
                         intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_SINGLE);
                         //单聊发送用户名称过去
@@ -117,12 +142,12 @@ public class ConversationMainFragment extends SimpleFragment {
         mConversationAdapter.setOnLongClickListener(new ConversationAdapter.OnLongClickListener() {
             @Override
             public void onLongClick(View view, final int postion) {
-                final Dialog dialog=DialogUtil.createMyselfDialog(mContext,
+                final Dialog dialog = DialogUtil.createMyselfDialog(mContext,
                         R.layout.dlg_two,//资源id号
                         Gravity.CENTER);//布局位置
                 //获取布局中的控件对象
-                TextView mTvDeleteConver= (TextView) dialog.findViewById(R.id.tv_one);
-                TextView mTvDeleteAll= (TextView) dialog.findViewById(R.id.tv_two);
+                TextView mTvDeleteConver = (TextView) dialog.findViewById(R.id.tv_one);
+                TextView mTvDeleteAll = (TextView) dialog.findViewById(R.id.tv_two);
                 //为控件设置文本
                 mTvDeleteConver.setText(getString(R.string.Delete_conversation));
                 mTvDeleteAll.setText(getString(R.string.Delete_conversation_and_data));
@@ -131,7 +156,7 @@ public class ConversationMainFragment extends SimpleFragment {
                 mTvDeleteConver.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        deleteConversation(postion,false);
+                        deleteConversation(postion, false);
                         dialog.dismiss();
                     }
                 });
@@ -139,20 +164,112 @@ public class ConversationMainFragment extends SimpleFragment {
                 mTvDeleteAll.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        deleteConversation(postion,true);
+                        deleteConversation(postion, true);
                         dialog.dismiss();
                     }
                 });
             }
         });
 
-
-        //添加会话监听器
+        //3.1-添加会话监听器
+        mEMConversationListener = new MyConversationListener();
         EMClient.getInstance().chatManager().addConversationListener(mEMConversationListener);
+        //5.1-添加服务器(网络)监听器
+        mEMConnectionListener = new MyConnectionListener();
+        EMClient.getInstance().addConnectionListener(mEMConnectionListener);
+
     }
 
-    /*3-创建对话监听器实例对象*/
-    EMConversationListener mEMConversationListener=new EMConversationListener() {
+    /*5.3-连接到服务器时的操作*/
+    protected void onConnectionConnected() {
+        mFlErrorItem.setVisibility(View.GONE);
+    }
+
+    /*5.2-为连接到服务器时的操作*/
+    protected void onConnectionDisconnected() {
+        mFlErrorItem.setVisibility(View.VISIBLE);
+        if (SystemUtil.isNetworkConnected()) {
+            //连接不到聊天服务器
+            mTvConnectErrormsg.setText(R.string.can_not_connect_chat_server_connection);
+        } else {
+            //当前网络不可用，请检查网络设置
+            mTvConnectErrormsg.setText(R.string.the_current_network);
+        }
+    }
+
+    /*5.0-自定义自己的网络状态监听类*/
+    public class MyConnectionListener implements EMConnectionListener {
+        //该监听方法是在子线程中进行的
+        @Override
+        public void onConnected() {
+            //需要在主线程中进行UI刷新,否则会异常退出
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    onConnectionConnected();
+                }
+            });
+        }
+        @Override
+        public void onDisconnected(int errorCode) {
+            if (errorCode == EMError.USER_REMOVED ||
+                    errorCode == EMError.USER_LOGIN_ANOTHER_DEVICE ||
+                    errorCode == EMError.SERVER_SERVICE_RESTRICTED) {
+                //isConflict = true;//冲突
+            } else {
+                //需要在主线程中进行UI刷新
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        onConnectionDisconnected();
+                    }
+                });
+            }
+        }
+    }
+
+    /*4.2-从其它的activity返回mainActivity时是回到焦点,此时更新列表较为合理*/
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!hidden) {
+            refresh();
+        }
+    }
+
+    /*4.1-在碎片处于非遮挡状态时重新刷新消息列表显示*/
+    //经实验,从mainActivity跳转到其它activity并不是碎片被遮挡,只有在单个活动中切换碎片时才叫遮挡
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        this.hidden = hidden;
+        //非遮挡状态时刷新显示
+        if (!hidden) {
+            refresh();
+        }
+    }
+
+    /*4.0-刷新列表显示*/
+    private void refresh() {
+        //重新加载显示列表
+        mEMConversationList.clear();
+        mEMConversationList.addAll(loadConversationList());
+        mConversationAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 3.2-碎片销毁时记得移除监听
+     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        //碎片销毁时移除监听
+        EMClient.getInstance().chatManager().removeConversationListener(mEMConversationListener);
+        EMClient.getInstance().removeConnectionListener(mEMConnectionListener);
+    }
+
+    /*3.0-自定义自己的会话状态监听类*/
+    public class MyConversationListener implements EMConversationListener {
         @Override
         public void onCoversationUpdate() {
             /*触发该监听的情况：
@@ -160,16 +277,15 @@ public class ConversationMainFragment extends SimpleFragment {
             * 2、删除某个会话后,第一次重新进入该会话聊天界面时
             * 3、删除某个会话和全部消息后,只要消息数是0,以后每次打开应用后第一次进入该聊天界面时*/
             //LogUtil.d("what_happened","会话更新了...");
-
         }
-    };
+    }
 
     /*2-删除会话的方法*/
-    private void deleteConversation(final int postion, final boolean isDeleteNews){
+    private void deleteConversation(final int postion, final boolean isDeleteNews) {
         //创建加载进度框
-        DialogUtil.createProgressDialog(mContext,null,
+        DialogUtil.createProgressDialog(mContext, null,
                 getString(R.string.Are_delete_with),//正在删除
-                false,false);//对话框无法被取消
+                false, false);//对话框无法被取消
         //开启子线程进行删除操作
         new Thread(new Runnable() {
             @Override
@@ -182,7 +298,7 @@ public class ConversationMainFragment extends SimpleFragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(DialogUtil.isProgressDialogShowing()){
+                        if (DialogUtil.isProgressDialogShowing()) {
                             DialogUtil.closeProgressDialog();
                         }
                         //刷新列表显示
@@ -196,10 +312,7 @@ public class ConversationMainFragment extends SimpleFragment {
         }).start();
     }
 
-    /**
-     * 1-获取会话列表
-     * @return List<EMConversation>
-     */
+    /*1.1-获取会话列表*/
     protected List<EMConversation> loadConversationList() {
         // 获取所有会话，包括陌生人
         Map<String, EMConversation> conversations = EMClient.getInstance().chatManager().
@@ -236,10 +349,7 @@ public class ConversationMainFragment extends SimpleFragment {
         return list;
     }
 
-    /**
-     * 根据最后一条消息的时间排序
-     * @param conversationList
-     */
+    /*1.0-根据最后一条消息的时间排序*/
     private void sortConversationByLastChatTime(List<Pair<Long, EMConversation>> conversationList) {
         //排序操作
         Collections.sort(conversationList, new Comparator<Pair<Long, EMConversation>>() {
@@ -257,40 +367,6 @@ public class ConversationMainFragment extends SimpleFragment {
         });
     }
 
-
-    //从其它的activity返回mainActivity时是回到焦点,此时更新列表较为合理
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
-    }
-
-    //在碎片处于非遮挡状态时重新刷新消息列表显示
-    //经实验,从mainActivity跳转到其它activity并不是碎片被遮挡,只有在单个活动中切换碎片时才叫遮挡
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        //非遮挡状态时刷新显示
-        if(!hidden){
-            refresh();
-        }
-    }
-
-    /*刷新列表显示*/
-    private void refresh(){
-        //重新加载显示列表
-        mEMConversationList.clear();
-        mEMConversationList.addAll(loadConversationList());
-        mConversationAdapter.notifyDataSetChanged();
-    }
-
-    /*碎片销毁时记得移除监听*/
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        //碎片销毁时移除监听
-        EMClient.getInstance().chatManager().removeConversationListener(mEMConversationListener);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

@@ -98,7 +98,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             holder.mIvAvatar.setBackgroundResource(R.drawable.em_groups_icon);
         } else {
             //联系人栏(多栏)
-            holder.mIvAvatar.setBackgroundResource(R.drawable.default_avatar);
+            holder.mIvAvatar.setBackgroundResource(R.drawable.em_default_avatar);
             /**设置首字母导航栏布局*/
             char header=contactUser.getInitialLetter();//获取到用户名的首字母
             //不为空：!='\0',不为空格：Character.isSpace(ch[i]))

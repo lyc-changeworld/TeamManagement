@@ -74,6 +74,25 @@ public class SystemUtil {
     }
 
     /*-------------------------2-集成功能相关--------------------------*/
+
+    /*跳转到网络设置界面的方法*/
+    public static void setNetWork(Context context){
+        // 跳转到系统的网络设置界面
+        Intent intent;
+        //判断手机系统的版本  即API大于10 就是3.0或以上版本
+        if(android.os.Build.VERSION.SDK_INT > 10 ){
+            //3.0以上打开设置界面，也可以直接用ACTION_WIRELESS_SETTINGS打开到wifi界面
+            intent=new Intent(android.provider.Settings.ACTION_SETTINGS);
+        }else {
+            intent = new Intent();
+            ComponentName component = new ComponentName("com.android.settings","com.android.settings.WirelessSettings");
+            intent.setComponent(component);
+            intent.setAction("android.intent.action.VIEW");
+        }
+        context.startActivity(intent);
+    }
+
+
     /***
      * 判断当前设备的网络是否打开,并提示是否跳转到网络设置界面
      ***/
@@ -89,19 +108,7 @@ public class SystemUtil {
                     new DialogUtil.OnAlertDialogButtonClickListener() {
                         @Override
                         public void onRightButtonClick() {
-                            // 跳转到系统的网络设置界面
-                            Intent intent;
-                            //判断手机系统的版本  即API大于10 就是3.0或以上版本
-                            if(android.os.Build.VERSION.SDK_INT > 10 ){
-                                //3.0以上打开设置界面，也可以直接用ACTION_WIRELESS_SETTINGS打开到wifi界面
-                                intent=new Intent(android.provider.Settings.ACTION_SETTINGS);
-                            }else {
-                                intent = new Intent();
-                                ComponentName component = new ComponentName("com.android.settings","com.android.settings.WirelessSettings");
-                                intent.setComponent(component);
-                                intent.setAction("android.intent.action.VIEW");
-                            }
-                            context.startActivity(intent);
+                            setNetWork(context);
                         }
                         @Override
                         public void onLeftButtonClick() {
@@ -114,6 +121,7 @@ public class SystemUtil {
                     });
         }
     }
+
     /***
      * 弹出对话框,确认是否退出App
      ***/

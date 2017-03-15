@@ -68,7 +68,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
     @Override
     protected void initEventAndData() {
         /********************检测并打开网络****************/
-        SystemUtil.checkAndShowNetSettingDialog(this);
+        //SystemUtil.checkAndShowNetSettingDialog(this);
         contentViewId = R.id.fl_main_content;//获取内容容器的ID号
         /***1-初始化底部导航栏设置***/
         //初始化第一次显示的item为设置界面

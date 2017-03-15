@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--功能：网络为连接的提示栏view-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@drawable/bg_chat_error_item"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical">
+        <!--警告图标-->
+        <ImageView
+            android:id="@+id/iv_neterror"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="9dp"
+            android:src="@drawable/em_login_error_icon" />
+        <!--警示语-->
+        <TextView
+            android:id="@+id/tv_connect_errormsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:text="@string/unable_to_connect"
+            android:textColor="#000" />
+    </LinearLayout>
+
+
+</LinearLayout>

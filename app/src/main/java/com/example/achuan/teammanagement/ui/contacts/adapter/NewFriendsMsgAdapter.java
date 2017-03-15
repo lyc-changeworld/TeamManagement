@@ -1,13 +1,17 @@
-package com.example.achuan.teammanagement.ui.main.adapter;
+package com.example.achuan.teammanagement.ui.contacts.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,11 +28,9 @@ import butterknife.ButterKnife;
 
 /**
  * Created by achuan on 16-10-5.
- * 功能：RY列表适配器类(这是个模板,大家可以在此基础上进行扩展)
- * MyBean是一个(模板)数据模型类,路径为：model/bean/
- * 注意：该文件具体使用时需移动到对应ui/modulexxx/adapter文件目录下,方便管理
+ * 功能：申请与通知消息列表的适配器类
  */
-public  class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdapter.ViewHolder> {
+public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdapter.ViewHolder> {
 
 
     private LayoutInflater mInflater;//创建布局装载对象来获取相关控件（类似于findViewById()）
@@ -90,11 +92,6 @@ public  class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAda
     //绑定ViewHolder
     public void onBindViewHolder(final ViewHolder holder, final int postion) {
         //再通过viewHolder中缓冲的控件添加相关数据
-        /*
-        * 这里结合下面自定义的viewHolder类,拿到控件的加载对象然后进行数据绑定
-        * 这一步比较重要,需要小心设置
-        * */
-        /***----------------------------------------***/
 
         String str1 = mContext.getResources().getString(
                 R.string.Has_agreed_to_your_friend_request);//已同意你的好友要请
@@ -103,56 +100,117 @@ public  class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAda
         String str3 = mContext.getResources().getString(
                 R.string.Request_to_add_you_as_a_friend);//请求加你为好友(默认显示的加好友理由)
 
-        final Button mBtnAgree=holder.mBtnAgree;
-        TextView mTvReason=holder.mTvReason;
-        TextView mTvName=holder.mTvName;
+        String str4 = mContext.getResources().getString(R.string.Apply_to_the_group_of);
+        String str5 = mContext.getResources().getString(R.string.Has_agreed_to);
+        String str6 = mContext.getResources().getString(R.string.Has_refused_to);
+
+        String str7 = mContext.getResources().getString(R.string.refuse);//拒绝
+        String str8 = mContext.getResources().getString(R.string.invite_join_group);
+
+        String str9 = mContext.getResources().getString(R.string.accept_join_group);
+        String str10 = mContext.getResources().getString(R.string.refuse_join_group);
+
+
+        final Button mBtnAgree = holder.mBtnAgree;
+        final Button mBtnRefuse = holder.mBtnUserState;
+        TextView mTvReason = holder.mTvReason;
+        TextView mTvName = holder.mTvName;
 
         final InviteMessage msg = mInviteMessageList.get(postion);
         if (msg != null) {
             //通过数据库中存储的序数来获取对应的状态
-            InviteMessage.InviteMesageStatus msgStatus= InviteMessage.
+            InviteMessage.InviteMesageStatus msgStatus = InviteMessage.
                     InviteMesageStatus.valueOf(msg.getStatusOrdinal());
-            //初始化设置
-            mTvReason.setText(msg.getReason());
-            mTvName.setText(msg.getFrom());
 
+            /***-初始化设置-****/
+            mBtnAgree.setVisibility(View.INVISIBLE);//先隐藏按钮
+            mTvName.setText(msg.getFrom());//对方姓名
+            mTvReason.setText(msg.getReason());//消息文本
+            //显示消息的时间
+            //holder.mTvTime.setText(DateUtils.getTimestampString(new Date(msg.getTime())));
+            /*群消息相关显示*/
+            if (msg.getGroupId() != null) {
+                //如果是群消息,显示群名称
+                holder.mLlGroup.setVisibility(View.VISIBLE);
+                holder.mTvGroupName.setText(msg.getGroupName());
+            } else {
+                holder.mLlGroup.setVisibility(View.GONE);
+            }
 
-            if (msgStatus== InviteMessage.InviteMesageStatus.BEINVITEED ||
+            if (msgStatus == InviteMessage.InviteMesageStatus.BEINVITEED ||
                     msgStatus == InviteMessage.InviteMesageStatus.BEAPPLYED ||
                     msgStatus == InviteMessage.InviteMesageStatus.GROUPINVITATION) {
-                //对方向你发起要请
+                //对方向你发起邀请
+                /*1-设置同意按钮*/
                 mBtnAgree.setVisibility(View.VISIBLE);
                 mBtnAgree.setEnabled(true);
-                //mBtnAgree.setBackgroundResource(R.drawable.btn_login_enable_shape);
                 mBtnAgree.setBackgroundResource(android.R.drawable.btn_default);
                 mBtnAgree.setText(str2);
-                if (msg.getReason() == null) {
-                    // 如果没写理由
-                    holder.mTvReason.setText(str3);
+                /*2-设置拒绝按钮*/
+                mBtnRefuse.setVisibility(View.VISIBLE);
+                mBtnRefuse.setEnabled(true);
+                mBtnRefuse.setText(str7);
+                /*3-根据消息类型,设置消息文本*/
+                if(msgStatus == InviteMessage.InviteMesageStatus.BEINVITEED){
+                    if (msg.getReason() == null) {
+                        // use default text
+                        mTvReason.setText(str3);
+                    }
+                }else if (msgStatus == InviteMessage.InviteMesageStatus.BEAPPLYED) {
+                    //application to join group
+                    if (TextUtils.isEmpty(msg.getReason())) {
+                        mTvReason.setText(str4 + msg.getGroupName());
+                    }
+                } else if (msgStatus == InviteMessage.InviteMesageStatus.GROUPINVITATION) {
+                    //对方邀请你入群
+                    if (TextUtils.isEmpty(msg.getReason())) {
+                        mTvReason.setText(str8 + msg.getGroupName());
+                    }
                 }
-                // 设置点击事件
+
+                /*设置按钮点击监听时间*/
+                //同意
                 mBtnAgree.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // 同意别人发的好友请求
-                        acceptInvitation(mBtnAgree,  msg);
+                        acceptInvitation(mBtnAgree,mBtnRefuse, msg);
                     }
                 });
-            }else if(msgStatus == InviteMessage.InviteMesageStatus.BEAGREED) {
+                //拒绝
+                mBtnRefuse.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        refuseInvitation(mBtnAgree,mBtnRefuse, msg);
+                    }
+                });
+            } else if (msgStatus == InviteMessage.InviteMesageStatus.BEAGREED) {
                 //对方同意了你的要请
-                mTvReason.setText(str1);
+                mBtnRefuse.setVisibility(View.INVISIBLE);//去掉所有的按钮显示
+                mTvReason.setText(str1);//显示对方已同意
             } else if (msgStatus == InviteMessage.InviteMesageStatus.AGREED) {
                 //我同意了对方的要请
-            } else if(msgStatus == InviteMessage.InviteMesageStatus.REFUSED){
+                mBtnRefuse.setText(str5);
+                mBtnRefuse.setBackgroundDrawable(null);
+                mBtnRefuse.setEnabled(false);
+            } else if (msgStatus == InviteMessage.InviteMesageStatus.REFUSED) {
                 //我拒绝了对方的要请
-            } else if(msgStatus == InviteMessage.InviteMesageStatus.GROUPINVITATION_ACCEPTED){
+                mBtnRefuse.setText(str6);
+                mBtnRefuse.setBackgroundDrawable(null);
+                mBtnRefuse.setEnabled(false);
+            } else if (msgStatus == InviteMessage.InviteMesageStatus.GROUPINVITATION_ACCEPTED) {
                 //收到对方同意群邀请的通知
-            } else if(msgStatus == InviteMessage.InviteMesageStatus.GROUPINVITATION_DECLINED){
+                String str = msg.getGroupInviter() + str9 + msg.getGroupName();//被邀请者同意入群
+                mBtnRefuse.setText(str);
+                mBtnRefuse.setBackgroundDrawable(null);
+                mBtnRefuse.setEnabled(false);
+            } else if (msgStatus == InviteMessage.InviteMesageStatus.GROUPINVITATION_DECLINED) {
                 //收到对方拒绝群邀请的通知
+                String str = msg.getGroupInviter() + str10 + msg.getGroupName();//被邀请者拒绝入群
+                mBtnRefuse.setText(str);
+                mBtnRefuse.setBackgroundDrawable(null);
+                mBtnRefuse.setEnabled(false);
             }
-
-
-
         }
         /***为item设置点击监听事件***/
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -174,17 +232,17 @@ public  class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAda
                 return false;//设置成false,这样就不会触发单击的监听事件
             }
         });
-
     }
 
 
     /**
      * 同意好友请求或者群申请
-     *
      * @param buttonAgree
+     * @param buttonRefuse
      * @param msg
      */
-    private void acceptInvitation(final Button buttonAgree , final InviteMessage msg) {
+    private void acceptInvitation(final Button buttonAgree, final Button buttonRefuse,
+                                  final InviteMessage msg) {
         String str1 = mContext.getResources().getString(
                 R.string.Are_agree_with);//正在同意
         final String str2 = mContext.getResources().getString(
@@ -193,13 +251,13 @@ public  class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAda
                 R.string.Agree_with_failure);//同意失败
 
         //通过数据库中存储的序数来获取对应的状态
-        final InviteMessage.InviteMesageStatus msgStatus= InviteMessage.
+        final InviteMessage.InviteMesageStatus msgStatus = InviteMessage.
                 InviteMesageStatus.valueOf(msg.getStatusOrdinal());
 
         /*创建加载对话框*/
-        DialogUtil.createProgressDialog(mContext,null,
+        DialogUtil.createProgressDialog(mContext, null,
                 str1,
-                false,false);
+                false, false);
         /*---开启子线程进行接受加好友操作---*/
         new Thread(new Runnable() {
             public void run() {
@@ -219,14 +277,14 @@ public  class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAda
                     /***对数据库进行更新状态操作***/
                     DBManager.updateMessage(
                             msg.getId(),//消息的id号
-                                    InviteMessage.InviteMesageStatus.AGREED.ordinal());//对应状态在枚举类中的序数
+                            InviteMessage.InviteMesageStatus.AGREED.ordinal());//对应状态在枚举类中的序数
 
                     //更新界面显示
                     ((Activity) mContext).runOnUiThread(new Runnable() {
                         @SuppressWarnings("deprecation")
                         @Override
                         public void run() {
-                            if(DialogUtil.isProgressDialogShowing()){
+                            if (DialogUtil.isProgressDialogShowing()) {
                                 DialogUtil.closeProgressDialog();
                             }
                             buttonAgree.setText(str2);
@@ -240,7 +298,7 @@ public  class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAda
                         @SuppressLint("ShowToast")
                         @Override
                         public void run() {
-                            if(DialogUtil.isProgressDialogShowing()){
+                            if (DialogUtil.isProgressDialogShowing()) {
                                 DialogUtil.closeProgressDialog();
                             }
                             Toast.makeText(mContext, str3 + e.getMessage(),
@@ -251,17 +309,43 @@ public  class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAda
             }
         }).start();
     }
+    /**
+     * 拒绝好友请求或者群申请
+     * @param buttonAgree
+     * @param buttonRefuse
+     * @param msg
+     */
+    private void refuseInvitation(final Button buttonAgree, final Button buttonRefuse,
+                                  final InviteMessage msg){
 
+
+
+    }
 
     /*创建自定义的ViewHolder类*/
     public static class ViewHolder extends RecyclerView.ViewHolder {
         //使用butterknife来进行item中的控件加载,此处需要自己添加
+        @BindView(R.id.iv_avatar)
+        ImageView mIvAvatar;
+        @BindView(R.id.rl_avatar_container)
+        RelativeLayout mRlAvatarContainer;
         @BindView(R.id.tv_name)
         TextView mTvName;
+        @BindView(R.id.iv_msg_state)
+        ImageView mIvMsgState;
         @BindView(R.id.tv_reason)
         TextView mTvReason;
         @BindView(R.id.btn_agree)
         Button mBtnAgree;
+        @BindView(R.id.btn_user_state)
+        Button mBtnUserState;
+        @BindView(R.id.tv_groupName)
+        TextView mTvGroupName;
+        @BindView(R.id.ll_group)
+        LinearLayout mLlGroup;
+        @BindView(R.id.tv_time)
+        TextView mTvTime;
+
         ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);

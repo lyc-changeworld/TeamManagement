@@ -21,6 +21,10 @@
     <color name="btn_logout_pressed">#DA5A4D</color>
     <color name="btn_gray_normal">#c0c0c0</color>
 
+    <!--环信即时通讯相关-->
+    <!--会话界面-->
+    <color name="error_item">#F6EBE6</color>
+
 
 
     <color name="white">#FFFFFF</color> <!--白色 -->
