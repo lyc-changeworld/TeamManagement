@@ -20,7 +20,7 @@ import butterknife.OnClick;
 
 /**
  * Created by achuan on 17-3-1.
- * 功能：
+ * 功能：添加联系人界面
  */
 
 public class AddContactActivity extends SimpleActivity {

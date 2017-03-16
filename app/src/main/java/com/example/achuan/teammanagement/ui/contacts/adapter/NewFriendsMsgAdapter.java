@@ -38,6 +38,9 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
     protected List<InviteMessage> mInviteMessageList;
 
 
+
+
+
     //定义两个接口引用变量
     private OnClickListener mOnClickListener;
     private OnLongClickListener mOnLongClickListener;
@@ -66,6 +69,8 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
         this.mInviteMessageList = mInviteMessageList;
         //通过获取context来初始化mInflater对象
         mInflater = LayoutInflater.from(mContext);
+
+
     }
 
     //适配器中数据集中的个数
@@ -125,7 +130,7 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
             /***-初始化设置-****/
             mBtnAgree.setVisibility(View.INVISIBLE);//先隐藏按钮
             mTvName.setText(msg.getFrom());//对方姓名
-            mTvReason.setText(msg.getReason());//消息文本
+            mTvReason.setText(msg.getReason());
             //显示消息的时间
             //holder.mTvTime.setText(DateUtils.getTimestampString(new Date(msg.getTime())));
             /*群消息相关显示*/
@@ -149,21 +154,22 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
                 /*2-设置拒绝按钮*/
                 mBtnRefuse.setVisibility(View.VISIBLE);
                 mBtnRefuse.setEnabled(true);
+                mBtnRefuse.setBackgroundResource(android.R.drawable.btn_default);
                 mBtnRefuse.setText(str7);
                 /*3-根据消息类型,设置消息文本*/
-                if(msgStatus == InviteMessage.InviteMesageStatus.BEINVITEED){
-                    if (msg.getReason() == null) {
+                /*if(msgStatus == InviteMessage.InviteMesageStatus.BEINVITEED){
+                    if (msg.getReason() == null||TextUtils.isEmpty(msg.getReason())) {
                         // use default text
                         mTvReason.setText(str3);
                     }
-                }else if (msgStatus == InviteMessage.InviteMesageStatus.BEAPPLYED) {
+                }else */if (msgStatus == InviteMessage.InviteMesageStatus.BEAPPLYED) {
                     //application to join group
-                    if (TextUtils.isEmpty(msg.getReason())) {
+                    if (msg.getReason() == null||TextUtils.isEmpty(msg.getReason())) {
                         mTvReason.setText(str4 + msg.getGroupName());
                     }
                 } else if (msgStatus == InviteMessage.InviteMesageStatus.GROUPINVITATION) {
                     //对方邀请你入群
-                    if (TextUtils.isEmpty(msg.getReason())) {
+                    if (msg.getReason() == null||TextUtils.isEmpty(msg.getReason())) {
                         mTvReason.setText(str8 + msg.getGroupName());
                     }
                 }
@@ -273,11 +279,14 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
                         //收到对方的群邀请
                         EMClient.getInstance().groupManager().acceptInvitation(msg.getGroupId(), msg.getGroupInviter());
                     }
+
                     //更新状态为:我同意了对方的请求
                     /***对数据库进行更新状态操作***/
+                    //......疑问:并没有设置msg的id号,不清楚这里是怎么通过id号更新状态的,后续需要解决弄懂
                     DBManager.updateMessage(
                             msg.getId(),//消息的id号
                             InviteMessage.InviteMesageStatus.AGREED.ordinal());//对应状态在枚举类中的序数
+
 
                     //更新界面显示
                     ((Activity) mContext).runOnUiThread(new Runnable() {
@@ -287,14 +296,17 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
                             if (DialogUtil.isProgressDialogShowing()) {
                                 DialogUtil.closeProgressDialog();
                             }
-                            buttonAgree.setText(str2);
-                            buttonAgree.setBackgroundDrawable(null);//同意按钮消失
+                            /*左边按钮*/
+                            buttonAgree.setVisibility(View.INVISIBLE);//同意按钮消失
                             buttonAgree.setEnabled(false);
+                            /*右边按钮*/
+                            buttonRefuse.setText(str2);
+                            buttonRefuse.setBackgroundDrawable(null);//去掉边框,只显示文本
+                            buttonRefuse.setEnabled(false);
                         }
                     });
                 } catch (final Exception e) {
                     ((Activity) mContext).runOnUiThread(new Runnable() {
-
                         @SuppressLint("ShowToast")
                         @Override
                         public void run() {
@@ -309,6 +321,7 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
             }
         }).start();
     }
+
     /**
      * 拒绝好友请求或者群申请
      * @param buttonAgree
@@ -317,10 +330,76 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
      */
     private void refuseInvitation(final Button buttonAgree, final Button buttonRefuse,
                                   final InviteMessage msg){
+        String str1 = mContext.getResources().getString(R.string.Are_refuse_with);
+        final String str2 = mContext.getResources().getString(R.string.Has_refused_to);
+        final String str3 = mContext.getResources().getString(R.string.Refuse_with_failure);
 
+        //通过数据库中存储的序数来获取对应的状态
+        final InviteMessage.InviteMesageStatus msgStatus = InviteMessage.
+                InviteMesageStatus.valueOf(msg.getStatusOrdinal());
 
+        /*创建加载对话框*/
+        DialogUtil.createProgressDialog(mContext, null,
+                str1, false, false);
 
+        /*---开启子线程进行接受加好友操作---*/
+        new Thread(new Runnable() {
+            public void run() {
+                // 调用sdk的拒绝方法
+                try {
+                    if (msgStatus == InviteMessage.InviteMesageStatus.BEINVITEED) {
+                        //拒绝好友请求
+                        EMClient.getInstance().contactManager().declineInvitation(msg.getFrom());
+                    } else if (msgStatus == InviteMessage.InviteMesageStatus.BEAPPLYED) {
+                        //拒绝对方的加群申请
+                        EMClient.getInstance().groupManager().declineApplication(
+                                msg.getFrom(), msg.getGroupId(),"");
+                    } else if (msgStatus == InviteMessage.InviteMesageStatus.GROUPINVITATION) {
+                        //拒绝对方的群邀请
+                        EMClient.getInstance().groupManager().declineInvitation(
+                                msg.getGroupId(), msg.getGroupInviter(),"");
+                    }
+                    //更新状态为:我拒绝了对方的请求
+                    /***对数据库进行更新状态操作***/
+                    //......疑问:并没有设置msg的id号,不清楚这里是怎么通过id号更新状态的,后续需要解决弄懂
+                    DBManager.updateMessage(
+                            msg.getId(),//消息的id号
+                            InviteMessage.InviteMesageStatus.REFUSED.ordinal());//对应状态在枚举类中的序数
+
+                    //更新界面显示
+                    ((Activity) mContext).runOnUiThread(new Runnable() {
+                        @SuppressWarnings("deprecation")
+                        @Override
+                        public void run() {
+                            if (DialogUtil.isProgressDialogShowing()) {
+                                DialogUtil.closeProgressDialog();
+                            }
+                            /*左边按钮*/
+                            buttonAgree.setVisibility(View.INVISIBLE);//同意按钮消失
+                            buttonAgree.setEnabled(false);
+                            /*右边按钮*/
+                            buttonRefuse.setText(str2);
+                            buttonRefuse.setBackgroundDrawable(null);//去掉边框,只显示文本
+                            buttonRefuse.setEnabled(false);
+                        }
+                    });
+                } catch (final Exception e) {
+                    ((Activity) mContext).runOnUiThread(new Runnable() {
+                        @SuppressLint("ShowToast")
+                        @Override
+                        public void run() {
+                            if (DialogUtil.isProgressDialogShowing()) {
+                                DialogUtil.closeProgressDialog();
+                            }
+                            Toast.makeText(mContext, str3 + e.getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        }).start();
     }
+
 
     /*创建自定义的ViewHolder类*/
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -345,7 +424,6 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
         LinearLayout mLlGroup;
         @BindView(R.id.tv_time)
         TextView mTvTime;
-
         ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);

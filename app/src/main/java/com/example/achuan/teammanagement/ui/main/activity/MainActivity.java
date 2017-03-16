@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -158,6 +159,13 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
             InviteMessage msg = new InviteMessage();
             msg.setFrom(username);
             msg.setTime(System.currentTimeMillis());
+
+            /**-在消息源头进行特殊处理,提升用户体验*/
+            if(reason ==null|| TextUtils.isEmpty(reason)){
+                //请求加你为好友(默认显示的加好友理由)
+                reason=getString(R.string.Request_to_add_you_as_a_friend);
+            }
+
             msg.setReason(reason);
             // 设置相应status对应的序数
             msg.setStatusOrdinal(InviteMessage.InviteMesageStatus.BEINVITEED.ordinal());

@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * Created by achuan on 17-3-2.
- * 功能：
+ * 功能：LitePal数据库操作类
  */
 
 public class DBManager {
