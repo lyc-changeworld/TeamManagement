@@ -250,7 +250,7 @@ public class ConversationMainFragment extends SimpleFragment {
     }
 
     /*4.0-刷新列表显示*/
-    private void refresh() {
+    public void refresh() {
         //重新加载显示列表
         mEMConversationList.clear();
         mEMConversationList.addAll(loadConversationList());

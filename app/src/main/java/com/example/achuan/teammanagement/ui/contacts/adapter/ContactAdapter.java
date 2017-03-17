@@ -85,6 +85,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         //再通过viewHolder中缓冲的控件添加相关数据
         ContactUser contactUser = mContactUserList.get(postion);
 
+        TextView mTvHeader=holder.mTvHeader;
+        ImageView mIvAvatar=holder.mIvAvatar;
 
         //1-设置用户名
         holder.mTvName.setText(contactUser.getUserName());
@@ -92,27 +94,29 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         //设置头像
         if (postion == 0) {
             //最顶上的是申请和通知的栏(单栏)
-            holder.mIvAvatar.setBackgroundResource(R.drawable.em_new_friends_icon);
+            mIvAvatar.setBackgroundResource(R.drawable.em_new_friends_icon);
+            mTvHeader.setVisibility(View.GONE);
         } else if (postion == 1) {
             //群聊栏(单栏)
-            holder.mIvAvatar.setBackgroundResource(R.drawable.em_groups_icon);
+            mIvAvatar.setBackgroundResource(R.drawable.em_groups_icon);
+            mTvHeader.setVisibility(View.GONE);
         } else {
             //联系人栏(多栏)
-            holder.mIvAvatar.setBackgroundResource(R.drawable.em_default_avatar);
+            mIvAvatar.setBackgroundResource(R.drawable.em_default_avatar);
             /**设置首字母导航栏布局*/
             char header=contactUser.getInitialLetter();//获取到用户名的首字母
             //不为空：!='\0',不为空格：Character.isSpace(ch[i]))
             /*首字母相同的item,只在第一个item上显示字母header*/
-            if (postion == 2 || header !='\0' &&
+            if (postion == 2 ||header !='\0' &&
                     !(header== mContactUserList.get(postion - 1).getInitialLetter())) {
                 if (Character.isSpaceChar(header)) {
-                    holder.mTvHeader.setVisibility(View.GONE);
+                    mTvHeader.setVisibility(View.GONE);
                 } else {
-                    holder.mTvHeader.setVisibility(View.VISIBLE);
-                    holder.mTvHeader.setText(String.valueOf(header));
+                    mTvHeader.setVisibility(View.VISIBLE);
+                    mTvHeader.setText(String.valueOf(header));
                 }
             }else {
-                holder.mTvHeader.setVisibility(View.GONE);
+                mTvHeader.setVisibility(View.GONE);
             }
         }
         /***为item设置点击监听事件***/

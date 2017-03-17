@@ -26,7 +26,9 @@ import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.example.achuan.teammanagement.util.StringUtil;
 import com.example.achuan.teammanagement.util.SystemUtil;
 import com.hyphenate.EMContactListener;
+import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMMessage;
 
 import java.util.List;
 import java.util.Map;
@@ -58,19 +60,19 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    EMContactListener mEMContactListener;
-
+    EMContactListener mEMContactListener;//联系人监听
+    EMMessageListener mEMMessageListener;//消息监听
 
     @Override
     protected int getLayout() {
         return R.layout.activity_main;
     }
-
     @Override
     protected void initEventAndData() {
         /********************检测并打开网络****************/
         //SystemUtil.checkAndShowNetSettingDialog(this);
         contentViewId = R.id.fl_main_content;//获取内容容器的ID号
+
         /***1-初始化底部导航栏设置***/
         //初始化第一次显示的item为设置界面
         mLastMenuItem = mBtmNav.getMenu().findItem(R.id.bottom_0);
@@ -82,21 +84,110 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         //初始化toolbar
         setToolBar(mToolbar, (String) mLastMenuItem.getTitle(),false);
         //mToolbar.setLogo(R.drawable.logo);//设置logo
-        //默认先创建第一界面
+        //先添加这两个碎片
         mNewsMainFragment = new ConversationMainFragment();
+        mContactsMainFragment = new ContactsMainFragment();
+        addFragment(contentViewId,mContactsMainFragment);
+        addFragment(contentViewId,mNewsMainFragment);
+        //默认先显示会话界面
+        showFragment(mContactsMainFragment, mNewsMainFragment);
         //并将第一界面碎片添加到布局容器中
-        replaceFragment(contentViewId, getTargetFragment(showFragment));
+        //replaceFragment(contentViewId, getTargetFragment(showFragment));
         SharedPreferenceUtil.setCurrentItem(showFragment);
 
-        /***3-注册联系人变动监听***/
+        /**1.1-注册联系人变动监听***/
         mEMContactListener=new MyContactListener();
+        mEMMessageListener=new MyMessageListener();
         EMClient.getInstance().contactManager().setContactListener(mEMContactListener);
+    }
+
+
+    /**3.3-收到消息时刷新会话列表显示*/
+    private void refreshUIWithMessage() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                //更新显示未读消息数
+                //updateUnreadLabel();
+                //if (mBtmNav== 0) 如果当前处于会话界面,才进行会话界面实时更新
+                if(mNewsMainFragment!=null){
+                    //刷新会话列表显示
+                    mNewsMainFragment.refresh();
+                }
+            }
+        });
+    }
+
+    /**3.2-活动不再可见时移除监听*/
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EMClient.getInstance().chatManager().removeMessageListener(mEMMessageListener);
+    }
+
+    /**3.1-恢复交互时重新添加监听*/
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EMClient.getInstance().chatManager().addMessageListener(mEMMessageListener);
+    }
+
+    /**3.0-自定义消息listener类
+     * 在onResume()中添加,onStop()中移除
+     * */
+    public class MyMessageListener implements EMMessageListener{
+        //收到消息
+        @Override
+        public void onMessageReceived(List<EMMessage> messages) {
+            refreshUIWithMessage();
+        }
+        //收到透传消息
+        @Override
+        public void onCmdMessageReceived(List<EMMessage> messages) {
+
+        }
+        //收到已读回执
+        @Override
+        public void onMessageRead(List<EMMessage> messages) {
+
+        }
+        //收到已送达回执
+        @Override
+        public void onMessageDelivered(List<EMMessage> messages) {
+
+        }
+        //消息状态变动
+        @Override
+        public void onMessageChanged(EMMessage message, Object change) {
+
+        }
+    }
+
+    /**2-保存并提示消息的邀请消息
+     * @param msg
+     * */
+    private void notifyNewIviteMessage(InviteMessage msg){
+        /*if(inviteMessgeDao == null){
+            inviteMessgeDao = new InviteMessgeDao(MainActivity.this);
+        }
+        inviteMessgeDao.saveMessage(msg);
+        //保存未读数，这里没有精确计算
+        inviteMessgeDao.saveUnreadMessageCount(1);
+        // 提示有新消息
+        //响铃或其他操作*/
+        DBManager.saveMessage(msg);
 
     }
 
-    /***
-     * 自定义好友变化listener类
-     */
+    /**1.2-在活动销毁时移除联系人监听器*/
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EMClient.getInstance().contactManager().removeContactListener(mEMContactListener);
+    }
+
+    /**1.0-自定义好友变化listener类
+     * 在onCreate()中添加,onDestroy()中移除
+     * */
     public class MyContactListener implements EMContactListener{
         @Override
         public void onContactAdded(final String username) {
@@ -116,6 +207,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
             runOnUiThread(new Runnable(){
                 @Override
                 public void run() {
+                    mContactsMainFragment.refresh();//刷新通讯录界面显示
                     Toast.makeText(getApplicationContext(),
                             "增加联系人：+"+username,
                             Toast.LENGTH_SHORT).show();
@@ -136,21 +228,22 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
             runOnUiThread(new Runnable(){
                 @Override
                 public void run() {
+                    mContactsMainFragment.refresh();//刷新通讯录界面显示
                     Toast.makeText(getApplicationContext(), "删除联系人：+"+username, Toast.LENGTH_SHORT).show();
                 }
             });
         }
+        //收到邀请
         @Override
         public void onContactInvited(final String username, String reason) {
-            //收到邀请
-
             // 接到邀请的消息，如果不处理(同意或拒绝)，掉线后，服务器会自动再发过来，所以客户端不需要重复提醒
             List<InviteMessage> msgs = DBManager.getMessagesList();
 
             for (InviteMessage inviteMessage : msgs) {
                 //如果之前发的消息不是群邀请(好友邀请)且发起人名和当前发起人名相同,就把历史消息删除掉
                 /*当前是无群聊的情况,后面引入群聊后还需进行大量优化*/
-                if (inviteMessage.getGroupId() == null && inviteMessage.getFrom().equals(username)) {
+                if (inviteMessage.getGroupId() == null &&
+                        inviteMessage.getFrom().equals(username)) {
                     deleteMessage(username);
                 }
             }
@@ -179,9 +272,9 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
                 }
             });
         }
+        //好友请求被同意
         @Override
         public void onFriendRequestAccepted(final String username) {
-            //好友请求被同意
             List<InviteMessage> msgs = DBManager.getMessagesList();
 
             /***---注意：下面的逻辑有待改善！！！-***/
@@ -202,42 +295,37 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
                 @Override
                 public void run() {
                     Toast.makeText(getApplicationContext(),
-                            "好友申请同意：+"+username, Toast.LENGTH_SHORT).show();
+                            username+":同意了你的加好友请求", Toast.LENGTH_SHORT).show();
                 }
             });
         }
+        //好友请求被拒绝
         @Override
-        public void onFriendRequestDeclined(String username) {
-            //好友请求被拒绝
-            // 参考同意，被邀请实现此功能,demo未实现
-            //Log.d(username, username + "拒绝了你的好友请求");
+        public void onFriendRequestDeclined(final String username) {
+            List<InviteMessage> msgs = DBManager.getMessagesList();
+
+            /***---注意：下面的逻辑有待改善！！！-***/
+            for (InviteMessage inviteMessage : msgs) {
+                if (inviteMessage.getFrom().equals(username)) {
+                    return;
+                }
+            }
+
+            // 自己封装的javabean
+            InviteMessage msg = new InviteMessage();
+            msg.setFrom(username);
+            msg.setTime(System.currentTimeMillis());
+            msg.setStatusOrdinal(InviteMessage.InviteMesageStatus.BEREFUSED.ordinal());
+            //存储同意的消息
+            notifyNewIviteMessage(msg);
+            runOnUiThread(new Runnable(){
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),
+                            username+":拒绝了你的加好友请求", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
-    }
-
-    /***
-     * 在活动销毁时移除联系人监听器
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        EMClient.getInstance().contactManager().removeContactListener(mEMContactListener);
-    }
-
-    /**
-     * 保存并提示消息的邀请消息
-     * @param msg
-     */
-    private void notifyNewIviteMessage(InviteMessage msg){
-        /*if(inviteMessgeDao == null){
-            inviteMessgeDao = new InviteMessgeDao(MainActivity.this);
-        }
-        inviteMessgeDao.saveMessage(msg);
-        //保存未读数，这里没有精确计算
-        inviteMessgeDao.saveUnreadMessageCount(1);
-        // 提示有新消息
-        //响铃或其他操作*/
-        DBManager.saveMessage(msg);
-
     }
 
 
@@ -273,23 +361,24 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         return true;//返回true,表示允许item点击响应
     }
 
+    /*底部导航栏的切换监听事件*/
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.bottom_0:
                 showFragment = Constants.TYPE_NEWS;
                 //第一次加载显示时,才创建碎片对象,并添加到内容容器中
-                if (mNewsMainFragment == null) {
+                /*if (mNewsMainFragment == null) {
                     mNewsMainFragment = new ConversationMainFragment();
                     addFragment(contentViewId, mNewsMainFragment);
-                }
+                }*/
                 break;
             case R.id.bottom_1:
                 showFragment = Constants.TYPE_CONTACTS;
-                if (mContactsMainFragment == null) {
+                /*if (mContactsMainFragment == null) {
                     mContactsMainFragment = new ContactsMainFragment();
                     addFragment(contentViewId, mContactsMainFragment);
-                }
+                }*/
                 break;
             case R.id.bottom_2:
                 showFragment = Constants.TYPE_EXPLORE;

@@ -57,6 +57,9 @@ public class ContactsMainFragment extends SimpleFragment {
     Map<String, ContactUser> contactsMap;//指向本地联系人集合
     List<ContactUser> mContactUserList;//真正显示在列表中的联系人集合
 
+    protected boolean hidden;//记录挡住的状态
+
+    ContactUser topOne ,topTwo;//上面两行栏
 
 
     @Override
@@ -67,28 +70,19 @@ public class ContactsMainFragment extends SimpleFragment {
     @Override
     protected void initEventAndData() {
         mContext = getActivity();
-        mContactUserList = new ArrayList<ContactUser>();//创建集合对象
 
-        /**1-添加"申请与通知"、"群聊"的入口栏,点击item后跳转到对应栏目
-         * 注意：这部分建议使用include<>文件包裹为头部布局</>*/
-        ContactUser topOne = new ContactUser();
-        ContactUser topTwo = new ContactUser();
+        /**1-初始化列表数据*/
+        topOne = new ContactUser();
+        topTwo = new ContactUser();
         topOne.setUserName(getString(R.string.new_friends_msg));//申请与通知
         topOne.setInitialLetter('↑');
         topTwo.setUserName(getString(R.string.group_chat));//群聊
         topTwo.setInitialLetter('↑');
+        //创建集合对象,用来存储要在列表中显示的数据
+        mContactUserList = new ArrayList<ContactUser>();
+        //获取联系人数据的操作在onResume()方法中进行
 
-        /**2-对联系人数据进行处理*/
-        //先获取本地联系人集合数据
-        mContactUserList = new ArrayList<ContactUser>(
-                DBManager.getContactList().values());
-        /*让数组中的数据按照compareTo方法中的规则返回的结果进行排序*/
-        Collections.sort(mContactUserList);//联系人排好序的集合
-        mContactUserList.add(0, topTwo);//第二行
-        mContactUserList.add(0, topOne);//第一行
-        //getContactList();//过滤黑名单及排序
-
-        /***3-对列表的布局显示进行设置***/
+        /**2-对列表的布局显示进行设置***/
         //创建联系人列表适配器对象实例
         mContactAdapter = new ContactAdapter(mContext, mContactUserList);
         linearlayoutManager = new LinearLayoutManager(mContext);
@@ -99,7 +93,7 @@ public class ContactsMainFragment extends SimpleFragment {
         //添加自定义的分割线
         mRv.addItemDecoration(new RyItemDivider(mContext, R.drawable.di_item));
 
-        /***4-为列表item添加点击监听事件***/
+        /**3-为列表item添加点击监听事件***/
         //点击事件
         mContactAdapter.setOnClickListener(new ContactAdapter.OnClickListener() {
             @Override
@@ -163,7 +157,7 @@ public class ContactsMainFragment extends SimpleFragment {
             }
         });
 
-        /**5-设置索引栏点击监听事件,实现点击字母实现列表栏定位移动*/
+        /**4-设置索引栏点击监听事件,实现点击字母实现列表栏定位移动*/
         mSidebar.setTextView(mTvFloatingHeader);//添加中间部分显示控件
         mSidebar.setOnTouchingLetterChangedListener(new SideBar.OnChooseLetterChangedListener() {
             @Override
@@ -182,11 +176,9 @@ public class ContactsMainFragment extends SimpleFragment {
 
             }
         });
-
-
     }
 
-    /***根据右边栏点击的字母来实现列表滚动到对应的位置***/
+    /*3-根据右边栏点击的字母来实现列表滚动到对应的位置*/
     public int getFirstPositionByChar(char sign) {
         for (int i = 0; i < mContactUserList.size(); i++) {
             if (mContactUserList.get(i).getInitialLetter() == sign) {
@@ -196,7 +188,7 @@ public class ContactsMainFragment extends SimpleFragment {
         return -1;//-1代表无该字符索引
     }
 
-    /*1-删除联系人的方法*/
+    /*2-删除联系人的方法*/
     private void deleteContact(final String username, final int postion) {
         //创建加载进度框
         DialogUtil.createProgressDialog(mContext, null,
@@ -219,10 +211,10 @@ public class ContactsMainFragment extends SimpleFragment {
                                 DialogUtil.closeProgressDialog();
                             }
                             //刷新列表显示
-                            mContactUserList.remove(postion);
+                            //mContactUserList.remove(postion);
                             //调用下面的方法进行数据刷新比较保险,
                             //之前用notifyItemRemoved(postion)时出现了数据更新不及时的情况
-                            mContactAdapter.notifyDataSetChanged();
+                            //mContactAdapter.notifyDataSetChanged();
                         }
                     });
                 } catch (HyphenateException e) {
@@ -232,6 +224,39 @@ public class ContactsMainFragment extends SimpleFragment {
         }).start();
     }
 
+    /*1.2-恢复交换时刷新显示*/
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(!hidden){
+            refresh();
+        }
+    }
+
+    /*1.1-监听碎片的遮挡情况*/
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        this.hidden=hidden;
+        if(!hidden){
+            refresh();
+        }
+    }
+
+    /*1.0-刷新联系人列表显示的方法*/
+    public void refresh() {
+        /**添加"申请与通知"、"群聊"的入口栏,点击item后跳转到对应栏目
+         * 注意：这部分建议使用include<>文件包裹为头部布局</>*/
+        mContactUserList.clear();//清空
+        //getContactList();//过滤黑名单及排序
+        mContactUserList.addAll(DBManager.getContactList().values());
+        /*让数组中的数据按照compareTo方法中的规则返回的结果进行排序*/
+        Collections.sort(mContactUserList);//联系人排好序的集合
+        mContactUserList.add(0, topTwo);//第二行(群聊)
+        mContactUserList.add(0, topOne);//第一行(申请与通知)
+        //刷新列表
+        mContactAdapter.notifyDataSetChanged();
+    }
 
     /*获取联系人列表，并过滤掉黑名单和排序*/
     protected void getContactList() {

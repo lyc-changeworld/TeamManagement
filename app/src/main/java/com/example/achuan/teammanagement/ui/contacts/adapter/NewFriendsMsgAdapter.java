@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,9 +35,6 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
     private LayoutInflater mInflater;//创建布局装载对象来获取相关控件（类似于findViewById()）
     private Context mContext;//显示框面
     protected List<InviteMessage> mInviteMessageList;
-
-
-
 
 
     //定义两个接口引用变量
@@ -149,20 +145,15 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
                 /*1-设置同意按钮*/
                 mBtnAgree.setVisibility(View.VISIBLE);
                 mBtnAgree.setEnabled(true);
-                mBtnAgree.setBackgroundResource(android.R.drawable.btn_default);
+                //mBtnAgree.setBackgroundResource(android.R.drawable.btn_default);
                 mBtnAgree.setText(str2);
                 /*2-设置拒绝按钮*/
                 mBtnRefuse.setVisibility(View.VISIBLE);
                 mBtnRefuse.setEnabled(true);
-                mBtnRefuse.setBackgroundResource(android.R.drawable.btn_default);
+                //mBtnRefuse.setBackgroundResource(android.R.drawable.btn_default);
                 mBtnRefuse.setText(str7);
                 /*3-根据消息类型,设置消息文本*/
-                /*if(msgStatus == InviteMessage.InviteMesageStatus.BEINVITEED){
-                    if (msg.getReason() == null||TextUtils.isEmpty(msg.getReason())) {
-                        // use default text
-                        mTvReason.setText(str3);
-                    }
-                }else */if (msgStatus == InviteMessage.InviteMesageStatus.BEAPPLYED) {
+                /*if (msgStatus == InviteMessage.InviteMesageStatus.BEAPPLYED) {
                     //application to join group
                     if (msg.getReason() == null||TextUtils.isEmpty(msg.getReason())) {
                         mTvReason.setText(str4 + msg.getGroupName());
@@ -172,7 +163,7 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
                     if (msg.getReason() == null||TextUtils.isEmpty(msg.getReason())) {
                         mTvReason.setText(str8 + msg.getGroupName());
                     }
-                }
+                }*/
 
                 /*设置按钮点击监听时间*/
                 //同意
@@ -249,6 +240,7 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
      */
     private void acceptInvitation(final Button buttonAgree, final Button buttonRefuse,
                                   final InviteMessage msg) {
+
         String str1 = mContext.getResources().getString(
                 R.string.Are_agree_with);//正在同意
         final String str2 = mContext.getResources().getString(
