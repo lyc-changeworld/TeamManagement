@@ -17,9 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
-import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleFragment;
-import com.example.achuan.teammanagement.ui.conversation.activity.ChatActivity;
+import com.example.achuan.teammanagement.ui.conversation.activity.MyChatActivity;
 import com.example.achuan.teammanagement.ui.conversation.adapter.ConversationAdapter;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
@@ -30,6 +29,7 @@ import com.hyphenate.EMConversationListener;
 import com.hyphenate.EMError;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.easeui.EaseConstant;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,21 +119,28 @@ public class ConversationMainFragment extends SimpleFragment {
                             Toast.LENGTH_SHORT).show();
                 else {
                     // 进入聊天页面
-                    Intent intent = new Intent(mContext, ChatActivity.class);
+                    Intent intent = new Intent(mContext, MyChatActivity.class);
                     if (conversation.isGroup()) {
                         //如果是群聊天
-                        if (conversation.getType() == EMConversation.EMConversationType.GroupChat) {
+                        /*if (conversation.getType() == EMConversation.EMConversationType.GroupChat) {
                             //传递信息,说明该为群聊
                             intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_GROUP);
                             //群聊发送群组的id号过去
                             intent.putExtra(Constants.EXTRA_GROUP_ID, username);
+                        }*/
+                        if (conversation.getType() == EMConversation.EMConversationType.GroupChat){
+                            intent.putExtra(EaseConstant.EXTRA_CHAT_TYPE, EaseConstant.CHATTYPE_GROUP);
                         }
                     } else {
-                        //传递信息,说明该为单聊
+                        /*//传递信息,说明该为单聊
                         intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_SINGLE);
                         //单聊发送用户名称过去
-                        intent.putExtra(Constants.EXTRA_USER_ID, username);
+                        intent.putExtra(Constants.EXTRA_USER_ID, username);*/
                     }
+                    //
+                    //intent.putExtra(Constants.EXTRA_USER_ID, username);
+                    intent.putExtra(EaseConstant.EXTRA_USER_ID, username);
+
                     startActivity(intent);
                 }
             }

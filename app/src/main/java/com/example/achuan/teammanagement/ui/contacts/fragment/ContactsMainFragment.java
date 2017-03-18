@@ -13,18 +13,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.achuan.teammanagement.R;
-import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleFragment;
 import com.example.achuan.teammanagement.model.db.ContactUser;
 import com.example.achuan.teammanagement.model.db.DBManager;
 import com.example.achuan.teammanagement.ui.contacts.activity.GroupsActivity;
 import com.example.achuan.teammanagement.ui.contacts.activity.NewFriendsMsgActivity;
 import com.example.achuan.teammanagement.ui.contacts.adapter.ContactAdapter;
-import com.example.achuan.teammanagement.ui.conversation.activity.ChatActivity;
+import com.example.achuan.teammanagement.ui.conversation.activity.MyChatActivity;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
 import com.example.achuan.teammanagement.widget.SideBar;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.easeui.EaseConstant;
 import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
@@ -108,11 +108,11 @@ public class ContactsMainFragment extends SimpleFragment {
                     startActivity(intent);
                 } else {
                     //点击联系人跳转到对应人的聊天界面
-                    Intent intent = new Intent(mContext, ChatActivity.class);
+                    Intent intent = new Intent(mContext, MyChatActivity.class);
                     //传递信息,说明该为单聊
-                    intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_SINGLE);
+                    intent.putExtra(EaseConstant.EXTRA_CHAT_TYPE, EaseConstant.CHATTYPE_SINGLE);
                     //发送联系人的名称到聊天界面
-                    intent.putExtra(Constants.EXTRA_USER_ID,
+                    intent.putExtra(EaseConstant.EXTRA_USER_ID,
                             mContactUserList.get(postion).getUserName());
                     startActivity(intent);
                 }

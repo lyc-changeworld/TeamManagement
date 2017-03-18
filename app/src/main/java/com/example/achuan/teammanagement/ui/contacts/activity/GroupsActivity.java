@@ -15,10 +15,11 @@ import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleActivity;
 import com.example.achuan.teammanagement.ui.contacts.adapter.GroupAdapter;
-import com.example.achuan.teammanagement.ui.conversation.activity.ChatActivity;
+import com.example.achuan.teammanagement.ui.conversation.activity.MyChatActivity;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMGroup;
+import com.hyphenate.easeui.EaseConstant;
 import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
@@ -89,11 +90,11 @@ public class GroupsActivity extends SimpleActivity {
             @Override
             public void onClick(View view, int postion) {
                 // enter group chat
-                Intent intent = new Intent(GroupsActivity.this, ChatActivity.class);
+                Intent intent = new Intent(GroupsActivity.this, MyChatActivity.class);
                 //传递信息,说明该为群聊
-                intent.putExtra(Constants.EXTRA_CHAT_TYPE, Constants.CHATTYPE_GROUP);
+                intent.putExtra(EaseConstant.EXTRA_CHAT_TYPE, EaseConstant.CHATTYPE_GROUP);
                 //传递群组ID号,用来加载对应群组信息
-                intent.putExtra(Constants.EXTRA_GROUP_ID,
+                intent.putExtra(EaseConstant.EXTRA_USER_ID,
                         mEMGroupList.get(postion).getGroupId());
                 startActivityForResult(intent, Constants.CHAT_REQUEST_CODE);
             }

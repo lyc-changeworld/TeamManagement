@@ -65,6 +65,16 @@
         <activity android:name=".ui.contacts.activity.GroupPickContactsActivity"></activity>
 
 
+        <!--在easeui基础上修改的聊天界面-->
+        <activity android:name=".ui.conversation.activity.MyChatActivity"
+                  android:launchMode="singleTask"
+                  android:screenOrientation="portrait"
+                  android:windowSoftInputMode="adjustResize|stateHidden|stateUnchanged"></activity>
+        <!--显示大图片界面-->
+        <activity android:name="com.hyphenate.easeui.ui.EaseShowBigImageActivity"></activity>
+        <!--显示地图-->
+        <activity android:name="com.hyphenate.easeui.ui.EaseBaiduMapActivity"></activity>
+
         <!--********************************环信配置相关********************************-->
         <!-- 设置环信应用的AppKey 可以在Application文件中java代码设置-->
         <!--<meta-data android:name="EASEMOB_APPKEY"  android:value="1145161121178643#teammanagement" />-->
