@@ -28,8 +28,7 @@ public class MyChatActivity extends SimpleActivity {
         mMyChatFragment=new MyChatFragment();
         //pass parameters to chat fragment
         mMyChatFragment.setArguments(getIntent().getExtras());
-        getSupportFragmentManager().beginTransaction().add(
-                R.id.container, mMyChatFragment).commit();
 
+        addFragment(R.id.container,mMyChatFragment);
     }
 }

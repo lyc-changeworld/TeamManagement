@@ -22,6 +22,8 @@
     <string name="toolbar_main_title_1">添加</string>
     <string name="toolbar_main_title_2">添加朋友</string>
     <string name="toolbar_main_title_3">扫一扫</string>
+    <!--聊天界面toolbar中菜单项-->
+    <string name="toolbar_chat_right">右边</string>
 
     <!--4-不同界面Toolbar上标题内容-->
     <string name="add_group">新建群组</string>

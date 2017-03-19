@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--android:showAsAction来指定按钮的显示位置
+    　　　always:永远显示在Toolbar中
+    　　　ifRoom:屏幕空间足够时显示,不够就显示在菜单当中
+    　　　never:永远显示在菜单当中-->
+    <!--
+        id:之后设置点击事件的时候找到当前菜单项的唯一标识
+        title:必填项，Toolbar栏的menu标题
+        [如果存在icon，则显示icon图标，不显示文字]
+        [如果不存在icon,则显示文字]
+        app:showAsAction = "ifRoom" ：显示为一个行为
+        android:showAsAction="ifRoom":icon失效显示图标为“3个竖立的点”
+    -->
+    <!--搜索-->
+    <item
+        android:id="@+id/chat_right"
+        app:showAsAction="always"
+        android:title="@string/toolbar_chat_right">
+    </item>
+
+
+</menu>
