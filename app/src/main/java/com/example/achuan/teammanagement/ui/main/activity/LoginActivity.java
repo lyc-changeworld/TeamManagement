@@ -17,6 +17,7 @@ import com.example.achuan.teammanagement.base.SimpleActivity;
 import com.example.achuan.teammanagement.model.db.ContactUser;
 import com.example.achuan.teammanagement.model.db.DBManager;
 import com.example.achuan.teammanagement.util.DialogUtil;
+import com.example.achuan.teammanagement.util.MobUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.example.achuan.teammanagement.util.SnackbarUtil;
 import com.example.achuan.teammanagement.util.StringUtil;
@@ -122,8 +123,9 @@ public class LoginActivity extends SimpleActivity {
                 SnackbarUtil.showShort(view,"该功能还未实现...");
                 break;
             case R.id.tv_newUser://新用户注册
-                Intent intent = new Intent(this, RegisterActivity.class);
-                startActivity(intent);
+                /*Intent intent = new Intent(this, RegisterActivity.class);
+                startActivity(intent);*/
+                MobUtil.registerBySms(LoginActivity.this);
                 break;
             default:break;
         }

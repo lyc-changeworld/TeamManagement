@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.app.App;
@@ -98,6 +99,8 @@ public class SystemUtil {
      ***/
     public static void checkAndShowNetSettingDialog(final Context context){
         final Resources resources=context.getResources();
+        final String str1=resources.getString(
+                R.string.warn_bad_consequence_of_not_connect_network);
         if(!isNetworkConnected()){
             DialogUtil.createOrdinaryDialog(context,
                     resources.getString(R.string.warn),
@@ -112,11 +115,13 @@ public class SystemUtil {
                         }
                         @Override
                         public void onLeftButtonClick() {
-                            TastyToastUtil.warning_long(
+                            /*TastyToastUtil.warning_long(
                                     context,
                                     resources.getString(
                                             R.string.warn_bad_consequence_of_not_connect_network
-                                    ));
+                                    ));*/
+                            Toast.makeText(context, str1,
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
         }
@@ -142,9 +147,9 @@ public class SystemUtil {
                     }
                     @Override
                     public void onLeftButtonClick() {
-                        TastyToastUtil.info_short(
+                        /*TastyToastUtil.info_short(
                                 context,
-                                resources.getString(R.string.almost_exitApp));
+                                resources.getString(R.string.almost_exitApp));*/
                     }
                 });
     }

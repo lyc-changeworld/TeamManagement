@@ -18,3 +18,9 @@
 
 -keep class com.hyphenate.** {*;}
 -dontwarn  com.hyphenate.**
+
+-keep class cn.smssdk.**{*;}
+-keep class com.mob.**{*;}
+
+-dontwarn com.mob.**
+-dontwarn cn.smssdk.**

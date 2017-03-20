@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import cn.smssdk.SMSSDK;
+
 
 /*
 * 踩坑经验：http://blog.csdn.net/qq137722697/article/details/52200355
@@ -28,6 +30,11 @@ import java.util.List;
  */
 
 public class App  extends Application {
+
+
+    /***在服务器端获取的Mob应用key和secret*/
+    private static String MobAppkey="1c3919a8f1f78";
+    private static String MobAppsecret="7ac5de47980f78446f5ea7be9556b770";
 
     //单例模式定义变量,保证只会实例化一次
     private static App instance;
@@ -53,7 +60,9 @@ public class App  extends Application {
         super.onCreate();
         instance = this;
         sContext=getApplicationContext();//获得一个应用程序级别的Context
-        /*---Litepal数据库初始化---*/
+        /**-初始化Mob的后台服务*/
+        SMSSDK.initSDK(this,MobAppkey,MobAppsecret);
+        /**-Litepal数据库初始化---*/
         LitePal.initialize(this);
         /***环信-初始化SDK和EaseUI***/
         initHyphenate(sContext);

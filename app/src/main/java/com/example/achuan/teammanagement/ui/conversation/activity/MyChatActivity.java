@@ -29,6 +29,8 @@ public class MyChatActivity extends SimpleActivity {
         //pass parameters to chat fragment
         mMyChatFragment.setArguments(getIntent().getExtras());
 
+        //添加碎片到内容区域
         addFragment(R.id.container,mMyChatFragment);
+
     }
 }
