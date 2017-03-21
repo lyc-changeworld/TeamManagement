@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
+import com.example.achuan.teammanagement.app.App;
 import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleActivity;
 import com.example.achuan.teammanagement.model.db.ContactUser;
@@ -22,13 +23,18 @@ import com.example.achuan.teammanagement.ui.contacts.fragment.ContactsMainFragme
 import com.example.achuan.teammanagement.ui.conversation.fragment.ConversationMainFragment;
 import com.example.achuan.teammanagement.ui.explore.fragment.ExploreMainFragment;
 import com.example.achuan.teammanagement.ui.myself.fragment.MyselfMainFragment;
+import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.example.achuan.teammanagement.util.StringUtil;
 import com.example.achuan.teammanagement.util.SystemUtil;
+import com.hyphenate.EMCallBack;
+import com.hyphenate.EMConnectionListener;
 import com.hyphenate.EMContactListener;
+import com.hyphenate.EMError;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMMessage;
+import com.hyphenate.util.EMLog;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +45,8 @@ import butterknife.ButterKnife;
 import static com.example.achuan.teammanagement.model.db.DBManager.deleteMessage;
 
 public class MainActivity extends SimpleActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+
+    public static final String TAG="MainActivity";
 
     //需要装载到主活动中的Fragment的引用变量
     ConversationMainFragment mNewsMainFragment;
@@ -62,11 +70,13 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
 
     EMContactListener mEMContactListener;//联系人监听
     EMMessageListener mEMMessageListener;//消息监听
+    EMConnectionListener mEMConnectionListener;//用户连接监听
 
     @Override
     protected int getLayout() {
         return R.layout.activity_main;
     }
+
     @Override
     protected void initEventAndData() {
         /********************检测并打开网络****************/
@@ -99,11 +109,101 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         mEMContactListener=new MyContactListener();
         mEMMessageListener=new MyMessageListener();
         EMClient.getInstance().contactManager().setContactListener(mEMContactListener);
+
+        /**4.2-注册用户登录监听*/
+        mEMConnectionListener=new MyConnectionListener();
+        EMClient.getInstance().addConnectionListener(mEMConnectionListener);
+
+    }
+
+
+    /**4.4-用户登录异常时,强制下线处理*/
+    private void forcedOfflineDeal(){
+
+        DialogUtil.createOneButtonDialog(this, "下线通知",
+                "同一账号已在其它设备登录", "确定", false, new DialogUtil.OnOneButtonDialogClickListener() {
+                    @Override
+                    public void onClick() {
+                                /*---执行登出操作---*/
+                        App.getInstance().logout(false,new EMCallBack() {
+                            @Override
+                            public void onSuccess() {
+                                runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        //后期可以设置是否退出后清空当前用户的缓存数据,即删除数据库文件
+                                        //结束主界面并跳转到登录页面
+                                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                                        finish();
+                                    }
+                                });
+                            }
+                            @Override
+                            public void onProgress(int progress, String status) {
+                            }
+                            @Override
+                            public void onError(int code, String message) {
+                                //需要在主线程中进行UI更新
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // TODO Auto-generated method stub
+                                        Toast.makeText(MainActivity.this,
+                                                "unbind devicetokens failed",
+                                                Toast.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+    }
+
+    /**4.3-用户登录异常后,提醒异常消息(强制下线),然后跳转到登录界面*/
+    protected void onUserException(String exception){
+        //EMLog.e(TAG, "onUserException: " + exception);
+        switch (exception){
+            case Constants.ACCOUNT_REMOVED:
+                break;
+            case Constants.ACCOUNT_CONFLICT:
+                forcedOfflineDeal();
+                break;
+            case Constants.ACCOUNT_FORBIDDEN:
+                break;
+            default:break;
+        }
+    }
+
+    /**4.1-自定义用户连接监听器类*/
+    public class MyConnectionListener implements EMConnectionListener{
+        @Override
+        public void onConnected() {
+
+        }
+        @Override
+        public void onDisconnected(final int errorCode) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    EMLog.d("global listener", "onDisconnect" + errorCode);
+                    if (errorCode == EMError.USER_REMOVED) {
+                        onUserException(Constants.ACCOUNT_REMOVED);
+                    } else if (errorCode == EMError.USER_LOGIN_ANOTHER_DEVICE) {
+                        onUserException(Constants.ACCOUNT_CONFLICT);
+                            /*Toast.makeText(MainActivity.this,
+                                    "同一账号已在异地登录",
+                                    Toast.LENGTH_SHORT).show();*/
+                    } else if (errorCode == EMError.SERVER_SERVICE_RESTRICTED) {
+                        onUserException(Constants.ACCOUNT_FORBIDDEN);
+                    }
+                }
+            });
+        }
     }
 
 
     /**3.3-收到消息时刷新会话列表显示*/
-    private void refreshUIWithMessage() {
+    private void refreshConversationWithMessage() {
         runOnUiThread(new Runnable() {
             public void run() {
                 //更新显示未读消息数
@@ -138,7 +238,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         //收到消息
         @Override
         public void onMessageReceived(List<EMMessage> messages) {
-            refreshUIWithMessage();
+            refreshConversationWithMessage();
         }
         //收到透传消息
         @Override
@@ -178,11 +278,13 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
 
     }
 
+
     /**1.2-在活动销毁时移除联系人监听器*/
     @Override
     protected void onDestroy() {
         super.onDestroy();
         EMClient.getInstance().contactManager().removeContactListener(mEMContactListener);
+        EMClient.getInstance().removeConnectionListener(mEMConnectionListener);
     }
 
     /**1.0-自定义好友变化listener类

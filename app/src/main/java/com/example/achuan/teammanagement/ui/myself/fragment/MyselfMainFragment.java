@@ -14,7 +14,6 @@ import com.example.achuan.teammanagement.app.App;
 import com.example.achuan.teammanagement.base.SimpleFragment;
 import com.example.achuan.teammanagement.ui.main.activity.LoginActivity;
 import com.example.achuan.teammanagement.util.DialogUtil;
-import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.hyphenate.EMCallBack;
 
 import butterknife.BindView;
@@ -82,8 +81,6 @@ public class MyselfMainFragment extends SimpleFragment {
                                             DialogUtil.closeProgressDialog();
                                         }
 
-                                        //清空当前使用用户
-                                        SharedPreferenceUtil.setCurrentUserName(null);
                                         //后期可以设置是否退出后清空当前用户的缓存数据,即删除数据库文件
 
                                         //结束主界面并跳转到登录页面

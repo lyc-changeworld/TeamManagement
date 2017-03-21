@@ -2,6 +2,7 @@ package com.example.achuan.teammanagement.app;
 
 /**
  * Created by achuan on 17-1-25.
+ * 功能：存放一些静态不变的量
  */
 
 public class Constants {
@@ -26,6 +27,11 @@ public class Constants {
 
 
     //=================环信即时通讯相关====================
+    //用户登录异常的情况
+    public static final String ACCOUNT_REMOVED = "account_removed";
+    public static final String ACCOUNT_CONFLICT = "conflict";
+    public static final String ACCOUNT_FORBIDDEN = "user_forbidden";
+
     //聊天消息的类型
     public static final String EXTRA_CHAT_TYPE="chatType";//当前会话的类型(单聊\群聊)
     public static final String EXTRA_USER_ID="userId";//单人聊天的名称
@@ -37,6 +43,7 @@ public class Constants {
     //创建群组
     public static final String GROUP_NAME="groupName";//创建群组时的群名称
     public static final String NEW_MEMBERS="newmembers";//创建群组时邀请的成员集合
+
 
 
     //=================REQUEST CODE请求码====================

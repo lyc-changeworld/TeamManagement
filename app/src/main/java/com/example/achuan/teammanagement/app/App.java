@@ -26,11 +26,12 @@ import cn.smssdk.SMSSDK;
 
 /**
  * Created by achuan on 17-1-25.
- * 功能：
+ * 功能：应用的初始化加载类
  */
 
 public class App  extends Application {
 
+    public static final String TAG="MyApplication";
 
     /***在服务器端获取的Mob应用key和secret*/
     private static String MobAppkey="1c3919a8f1f78";
@@ -66,6 +67,8 @@ public class App  extends Application {
         LitePal.initialize(this);
         /***环信-初始化SDK和EaseUI***/
         initHyphenate(sContext);
+
+
     }
 
     /***
@@ -175,6 +178,10 @@ public class App  extends Application {
             }
         });
     }
+
+
+
+
 
 
 

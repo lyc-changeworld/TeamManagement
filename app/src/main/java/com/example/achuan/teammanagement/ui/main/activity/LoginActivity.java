@@ -77,6 +77,13 @@ public class LoginActivity extends SimpleActivity {
         //设置Toolbar
         setToolBar(mToolbar, getString(R.string.login), true);
 
+        //默认用户名输入框显示历史用户名
+        if(SharedPreferenceUtil.getCurrentUserName()!=null){
+            String userName=SharedPreferenceUtil.getCurrentUserName();
+            mEtUsername.setText(userName);
+            mEtUsername.setSelection(userName.length());
+        }
+
         /***为Edit输入框添加输入监听类,实现合理的效果***/
         //对只有在用户名和密码的输入都不为空的情况下，button按钮才显示有效，
         // 可以自己构造一个TextChange的类，实现一个TextWatcher接口，

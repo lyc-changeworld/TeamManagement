@@ -22,6 +22,10 @@ public class DialogUtil {
 
     private static ProgressDialog sProgressDialog;
 
+    //单个按钮的普通窗口的接口
+    public interface OnOneButtonDialogClickListener{
+        void onClick();
+    }
     //普通窗口的接口
     public interface OnAlertDialogButtonClickListener {
         //右边按钮点击事件
@@ -43,6 +47,28 @@ public class DialogUtil {
         //左边按钮点击事件
         void onLeftButtonClick();
     }
+
+    /**0-创建只有一个按钮的普通对话框(强制操作)*/
+    public static void createOneButtonDialog(Context context, String title, String message,
+                                             String centerString, boolean isCancelable,
+                                             final OnOneButtonDialogClickListener oneButtonDialogClickListener){
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);//先创建一个构造实例
+        dialog.setTitle(title);//设置标题
+        dialog.setMessage(message);//设置内容部分
+        dialog.setCancelable(isCancelable);//设置是否可以通过Back键取消：false为不可以取消,true为可以取消
+
+        dialog.setPositiveButton(centerString, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(oneButtonDialogClickListener!=null){
+                    oneButtonDialogClickListener.onClick();
+                }
+            }
+        });
+        dialog.show();//将对话框显示出来
+    }
+
 
     /***1-创建一个最普通的对话框***/
     public static void createOrdinaryDialog(Context context, String title, String message,

@@ -22,7 +22,7 @@ import butterknife.OnClick;
 
 /**
  * Created by achuan on 17-2-27.
- * 功能：
+ * 功能：注册环信账号界面
  */
 
 public class RegisterActivity extends SimpleActivity {
