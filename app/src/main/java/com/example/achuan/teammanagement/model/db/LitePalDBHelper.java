@@ -1,5 +1,8 @@
 package com.example.achuan.teammanagement.model.db;
 
+import android.content.Context;
+
+import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
@@ -12,7 +15,24 @@ import java.util.Map;
  * 功能：LitePal数据库操作类
  */
 
-public class DBManager {
+public class LitePalDBHelper {
+
+    private static LitePalDBHelper instance = null;
+
+    /*单例模式构造实例*/
+    public synchronized static LitePalDBHelper getInstance(){
+        if(instance == null){
+            instance=new LitePalDBHelper();
+        }
+        return instance;
+    }
+
+
+    /*数据库初始化操作*/
+    public void init(Context context){
+        /**-Litepal数据库初始化---*/
+        LitePal.initialize(context);
+    }
 
     /*--------------------------1-邀请消息相关--------------------------*/
     /**
@@ -20,7 +40,7 @@ public class DBManager {
      * @param message
      * @return  返回这条messaged在db中的id
      */
-    public static Integer saveMessage(InviteMessage message){
+    public  Integer saveMessage(InviteMessage message){
         int id=-1;
         InviteMessage inviteMessage=new InviteMessage();
         inviteMessage.setFrom(message.getFrom());
@@ -41,7 +61,7 @@ public class DBManager {
      * 从本地数据库获取全部的messges
      * @return InviteMessage集合数据
      */
-    public static List<InviteMessage> getMessagesList(){
+    public  List<InviteMessage> getMessagesList(){
         List<InviteMessage> msgs = new ArrayList<InviteMessage>();
         //查询表格中的所有数据
         msgs= DataSupport.findAll(InviteMessage.class);
@@ -52,7 +72,7 @@ public class DBManager {
      * 更新message的状态(根据消息的id号进行更新)
      * @param msgId,mesageStatus
      */
-    public static void updateMessage(int msgId,int ordinal){
+    public  void updateMessage(int msgId,int ordinal){
         InviteMessage inviteMessage=new InviteMessage();
         inviteMessage.setStatusOrdinal(ordinal);//更新对应状态对应的序数
         inviteMessage.update(msgId);//更新对应id号的数据
@@ -62,7 +82,7 @@ public class DBManager {
      * 删除要求消息(根据消息发起人名称进行删除)
      * @param from
      */
-    public static void deleteMessage(String from){
+    public  void deleteMessage(String from){
         DataSupport.deleteAll(InviteMessage.class,"from=?",from);
     }
 
@@ -71,7 +91,7 @@ public class DBManager {
      * 保存一个联系人
      * @param user
      */
-    public static void saveContact(ContactUser user){
+    public  void saveContact(ContactUser user){
         ContactUser contactUser=new ContactUser();
         contactUser.setId(user.getId());
         contactUser.setUserName(user.getUserName());
@@ -87,7 +107,7 @@ public class DBManager {
      * 保存好友list （先清空表格,后重新存储联系人数据）
      * @param contactList
      */
-    public static void saveContactList(List<ContactUser> contactList) {
+    public  void saveContactList(List<ContactUser> contactList) {
         //存储联系人之前清空联系人表
         DataSupport.deleteAll(ContactUser.class);
         //轮询存储用户人
@@ -108,7 +128,7 @@ public class DBManager {
      * 获取好友list
      * @return Map<String, ContactUser>
      */
-    public static Map<String, ContactUser> getContactList() {
+    public  Map<String, ContactUser> getContactList() {
         //这里使用了Map集合:<key值,2.value值>
         Map<String, ContactUser> users = new Hashtable<String, ContactUser>();
         /*---查询表格中的所有数据---*/
@@ -124,7 +144,7 @@ public class DBManager {
      * 删除一个联系人
      * @param username
      */
-    public static void deleteContact(String username){
+    public  void deleteContact(String username){
         DataSupport.deleteAll(ContactUser.class,"userName=?",username);
     }
 

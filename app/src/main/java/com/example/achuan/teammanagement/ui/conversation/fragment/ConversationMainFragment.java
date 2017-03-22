@@ -18,12 +18,14 @@ import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleFragment;
+import com.example.achuan.teammanagement.model.http.EaseMobHelper;
 import com.example.achuan.teammanagement.ui.conversation.activity.MyChatActivity;
 import com.example.achuan.teammanagement.ui.conversation.adapter.ConversationAdapter;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
 import com.example.achuan.teammanagement.util.SystemUtil;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
+import com.hyphenate.EMCallBack;
 import com.hyphenate.EMConnectionListener;
 import com.hyphenate.EMConversationListener;
 import com.hyphenate.EMError;
@@ -179,8 +181,8 @@ public class ConversationMainFragment extends SimpleFragment {
         });
 
         //3.1-添加会话监听器
-        mEMConversationListener = new MyConversationListener();
-        EMClient.getInstance().chatManager().addConversationListener(mEMConversationListener);
+        /*mEMConversationListener = new MyConversationListener();
+        EMClient.getInstance().chatManager().addConversationListener(mEMConversationListener);*/
         //5.1-添加服务器(网络)监听器
         mEMConnectionListener = new MyConnectionListener();
         EMClient.getInstance().addConnectionListener(mEMConnectionListener);
@@ -276,16 +278,16 @@ public class ConversationMainFragment extends SimpleFragment {
     }
 
     /*3.0-自定义自己的会话状态监听类*/
-    public class MyConversationListener implements EMConversationListener {
+    /*public class MyConversationListener implements EMConversationListener {
         @Override
         public void onCoversationUpdate() {
-            /*触发该监听的情况：
+            *//*触发该监听的情况：
             * 1、删除某个会话时
             * 2、删除某个会话后,第一次重新进入该会话聊天界面时
-            * 3、删除某个会话和全部消息后,只要消息数是0,以后每次打开应用后第一次进入该聊天界面时*/
+            * 3、删除某个会话和全部消息后,只要消息数是0,以后每次打开应用后第一次进入该聊天界面时*//*
             //LogUtil.d("what_happened","会话更新了...");
         }
-    }
+    }*/
 
     /*2-删除会话的方法*/
     private void deleteConversation(final int postion, final boolean isDeleteNews) {
@@ -298,23 +300,44 @@ public class ConversationMainFragment extends SimpleFragment {
             @Override
             public void run() {
                 //删除和某个user会话，如果需要保留聊天记录，传false
-                EMClient.getInstance().chatManager().deleteConversation(
-                        mEMConversationList.get(postion).conversationId(),
-                        isDeleteNews);//false代表不删除消息,true则相反
-                /*回到主线程进行UI更新*/
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (DialogUtil.isProgressDialogShowing()) {
-                            DialogUtil.closeProgressDialog();
-                        }
-                        //刷新列表显示
-                        mEMConversationList.remove(postion);
-                        //调用下面的方法进行数据刷新比较保险,
-                        //之前用notifyItemRemoved(postion)时出现了数据更新不及时的情况
-                        mConversationAdapter.notifyDataSetChanged();
-                    }
-                });
+                EaseMobHelper.getInstance().deleteConversation(mEMConversationList.get(postion).conversationId(),
+                        isDeleteNews, new EMCallBack() {
+                            @Override
+                            public void onSuccess() {
+                                /*回到主线程进行UI更新*/
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (DialogUtil.isProgressDialogShowing()) {
+                                            DialogUtil.closeProgressDialog();
+                                        }
+                                        //刷新列表显示
+                                        mEMConversationList.remove(postion);
+                                        //调用下面的方法进行数据刷新比较保险,
+                                        //之前用notifyItemRemoved(postion)时出现了数据更新不及时的情况
+                                        mConversationAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                            @Override
+                            public void onError(int code, final String error) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (DialogUtil.isProgressDialogShowing()) {
+                                            DialogUtil.closeProgressDialog();
+                                        }
+                                        Toast.makeText(mContext,
+                                                error,
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                            @Override
+                            public void onProgress(int progress, String status) {
+
+                            }
+                        });
             }
         }).start();
     }

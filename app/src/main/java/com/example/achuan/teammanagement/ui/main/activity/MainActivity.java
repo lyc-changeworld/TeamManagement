@@ -13,12 +13,12 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
-import com.example.achuan.teammanagement.app.App;
 import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleActivity;
 import com.example.achuan.teammanagement.model.db.ContactUser;
-import com.example.achuan.teammanagement.model.db.DBManager;
+import com.example.achuan.teammanagement.model.db.LitePalDBHelper;
 import com.example.achuan.teammanagement.model.db.InviteMessage;
+import com.example.achuan.teammanagement.model.http.EaseMobHelper;
 import com.example.achuan.teammanagement.ui.contacts.fragment.ContactsMainFragment;
 import com.example.achuan.teammanagement.ui.conversation.fragment.ConversationMainFragment;
 import com.example.achuan.teammanagement.ui.explore.fragment.ExploreMainFragment;
@@ -42,7 +42,6 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.example.achuan.teammanagement.model.db.DBManager.deleteMessage;
 
 public class MainActivity extends SimpleActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -125,7 +124,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
                     @Override
                     public void onClick() {
                                 /*---执行登出操作---*/
-                        App.getInstance().logout(false,new EMCallBack() {
+                        EaseMobHelper.getInstance().logout(false,new EMCallBack() {
                             @Override
                             public void onSuccess() {
                                 runOnUiThread(new Runnable() {
@@ -274,7 +273,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         inviteMessgeDao.saveUnreadMessageCount(1);
         // 提示有新消息
         //响铃或其他操作*/
-        DBManager.saveMessage(msg);
+        LitePalDBHelper.getInstance().saveMessage(msg);
 
     }
 
@@ -296,7 +295,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
             //增加了联系人时回调此方法
             /*---保存增加的联系人---*/
             //获取本地联系人数据
-            Map<String, ContactUser> localUsers = DBManager.getContactList();
+            Map<String, ContactUser> localUsers = LitePalDBHelper.getInstance().getContactList();
             // 添加好友时可能会回调added方法两次
             if (!localUsers.containsKey(username)) {
                 //创建实例对象
@@ -304,7 +303,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
                 user.setUserName(username);
                 user.setInitialLetter(StringUtil.getHeadChar(username));
                 //进行查询操作,避免重复添加
-                DBManager.saveContact(user);
+                LitePalDBHelper.getInstance().saveContact(user);
             }
             runOnUiThread(new Runnable(){
                 @Override
@@ -320,12 +319,12 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         public void onContactDeleted(final String username) {
             //被删除时回调此方法
             //获取本地联系人数据
-            Map<String, ContactUser> localUsers = DBManager.getContactList();
+            Map<String, ContactUser> localUsers = LitePalDBHelper.getInstance().getContactList();
             // 本地包含此用户才执行删除操作
             if (localUsers.containsKey(username)) {
                 //从本地数据库中删除
-                DBManager.deleteContact(username);
-                DBManager.deleteMessage(username);
+                LitePalDBHelper.getInstance().deleteContact(username);
+                LitePalDBHelper.getInstance().deleteMessage(username);
             }
             runOnUiThread(new Runnable(){
                 @Override
@@ -339,14 +338,14 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         @Override
         public void onContactInvited(final String username, String reason) {
             // 接到邀请的消息，如果不处理(同意或拒绝)，掉线后，服务器会自动再发过来，所以客户端不需要重复提醒
-            List<InviteMessage> msgs = DBManager.getMessagesList();
+            List<InviteMessage> msgs = LitePalDBHelper.getInstance().getMessagesList();
 
             for (InviteMessage inviteMessage : msgs) {
                 //如果之前发的消息不是群邀请(好友邀请)且发起人名和当前发起人名相同,就把历史消息删除掉
                 /*当前是无群聊的情况,后面引入群聊后还需进行大量优化*/
                 if (inviteMessage.getGroupId() == null &&
                         inviteMessage.getFrom().equals(username)) {
-                    deleteMessage(username);
+                    LitePalDBHelper.getInstance().deleteMessage(username);
                 }
             }
 
@@ -377,7 +376,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         //好友请求被同意
         @Override
         public void onFriendRequestAccepted(final String username) {
-            List<InviteMessage> msgs = DBManager.getMessagesList();
+            List<InviteMessage> msgs = LitePalDBHelper.getInstance().getMessagesList();
 
             /***---注意：下面的逻辑有待改善！！！-***/
             for (InviteMessage inviteMessage : msgs) {
@@ -404,7 +403,7 @@ public class MainActivity extends SimpleActivity implements BottomNavigationView
         //好友请求被拒绝
         @Override
         public void onFriendRequestDeclined(final String username) {
-            List<InviteMessage> msgs = DBManager.getMessagesList();
+            List<InviteMessage> msgs = LitePalDBHelper.getInstance().getMessagesList();
 
             /***---注意：下面的逻辑有待改善！！！-***/
             for (InviteMessage inviteMessage : msgs) {

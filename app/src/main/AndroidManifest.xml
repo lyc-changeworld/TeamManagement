@@ -61,14 +61,14 @@
         <activity android:name=".ui.main.activity.AddContactActivity"></activity>
         <!--申请与通知消息界面-->
         <activity android:name=".ui.contacts.activity.NewFriendsMsgActivity"></activity>
-        <!--聊天界面-->
+        <!--&lt;!&ndash;聊天界面&ndash;&gt;
         <activity android:name=".ui.conversation.activity.ChatActivity"
                   android:screenOrientation="portrait"
                   android:windowSoftInputMode="adjustResize|stateHidden|stateUnchanged">
-            <!--对于没有滚动控件的布局来说，采用的是adjustPan方式，
-            而对于有滚动控件的布局，则是采用的adjustResize方式-->
-            <!--禁止进入activity自动弹出键盘:添加stateHidden|stateUnchanged-->
-        </activity>
+            &lt;!&ndash;对于没有滚动控件的布局来说，采用的是adjustPan方式，
+            而对于有滚动控件的布局，则是采用的adjustResize方式&ndash;&gt;
+            &lt;!&ndash;禁止进入activity自动弹出键盘:添加stateHidden|stateUnchanged&ndash;&gt;
+        </activity>-->
         <!--群聊主界面-->
         <activity android:name=".ui.contacts.activity.GroupsActivity"></activity>
         <!--新建群组界面-->

@@ -7,7 +7,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleActivity;
-import com.example.achuan.teammanagement.model.db.DBManager;
+import com.example.achuan.teammanagement.model.db.LitePalDBHelper;
 import com.example.achuan.teammanagement.model.db.InviteMessage;
 import com.example.achuan.teammanagement.ui.contacts.adapter.NewFriendsMsgAdapter;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
@@ -19,6 +19,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by achuan on 17-3-2.
+ * 功能：申请与通知界面
  */
 
 public class NewFriendsMsgActivity extends SimpleActivity {
@@ -41,7 +42,7 @@ public class NewFriendsMsgActivity extends SimpleActivity {
         //设置标题工具栏
         setToolBar(mToolbar,getString(R.string.new_friends_msg),true);//有返回按钮
 
-        List<InviteMessage> msgs= DBManager.getMessagesList();
+        List<InviteMessage> msgs= LitePalDBHelper.getInstance().getMessagesList();
         //创建联系人列表适配器对象实例
         mNewFriendsMsgAdapter=new NewFriendsMsgAdapter(this,msgs);
 

@@ -16,7 +16,7 @@ public class MyChatActivity extends SimpleActivity {
 
     @Override
     protected int getLayout() {
-        return R.layout.em_activity_chat;
+        return R.layout.my_activity_chat;
     }
 
     @Override

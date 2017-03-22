@@ -10,8 +10,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
-import com.example.achuan.teammanagement.app.App;
 import com.example.achuan.teammanagement.base.SimpleFragment;
+import com.example.achuan.teammanagement.model.http.EaseMobHelper;
 import com.example.achuan.teammanagement.ui.main.activity.LoginActivity;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.hyphenate.EMCallBack;
@@ -56,6 +56,7 @@ public class MyselfMainFragment extends SimpleFragment {
         }
     }
 
+    /***/
     private void logoutDeal() {
         //弹出对话框确认是否退出
         DialogUtil.createOrdinaryDialog(mContext,
@@ -72,7 +73,7 @@ public class MyselfMainFragment extends SimpleFragment {
                                 getString(R.string.Are_logged_out),
                                 false,false);//对话框无法被取消
                         /*---执行登出操作---*/
-                        App.getInstance().logout(false,new EMCallBack() {
+                        EaseMobHelper.getInstance().logout(false,new EMCallBack() {
                             @Override
                             public void onSuccess() {
                                 getActivity().runOnUiThread(new Runnable() {

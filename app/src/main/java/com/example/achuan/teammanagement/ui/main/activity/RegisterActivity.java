@@ -11,10 +11,10 @@ import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleActivity;
+import com.example.achuan.teammanagement.model.http.EaseMobHelper;
 import com.example.achuan.teammanagement.util.DialogUtil;
+import com.hyphenate.EMCallBack;
 import com.hyphenate.EMError;
-import com.hyphenate.chat.EMClient;
-import com.hyphenate.exceptions.HyphenateException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -114,45 +114,52 @@ public class RegisterActivity extends SimpleActivity {
             //开启子线程进行注册操作
             new Thread(new Runnable() {
                 public void run() {
-                    try {
-                        // 调用sdk注册方法
-                        EMClient.getInstance().createAccount(userName, firstPassword);
-                        //跳转到主线程进行UI更新
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-                                if (!RegisterActivity.this.isFinishing()&&DialogUtil.isProgressDialogShowing())
-                                    //关闭进度窗口
-                                    DialogUtil.closeProgressDialog();
-                                // 保存用户名
-                                //DemoApplication.getInstance().setCurrentUserName(username);
-                                Toast.makeText(getApplicationContext(),
-                                        getResources().getString(R.string.Registered_successfully),
-                                        Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
-                        });
-                    } catch (final HyphenateException e) {
-                        //出现异常,返回主线程进行UI提示
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-                                if (DialogUtil.isProgressDialogShowing()) {
-                                    DialogUtil.closeProgressDialog();
+                    // 调用sdk注册方法
+                    EaseMobHelper.getInstance().register(userName, firstPassword, new EMCallBack() {
+                        @Override
+                        public void onSuccess() {
+                            //跳转到主线程进行UI更新
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    if (!RegisterActivity.this.isFinishing()&&DialogUtil.isProgressDialogShowing())
+                                        //关闭进度窗口
+                                        DialogUtil.closeProgressDialog();
+                                    // 保存用户名
+                                    //DemoApplication.getInstance().setCurrentUserName(username);
+                                    Toast.makeText(getApplicationContext(),
+                                            getResources().getString(R.string.Registered_successfully),
+                                            Toast.LENGTH_SHORT).show();
+                                    finish();
                                 }
-                                int errorCode = e.getErrorCode();
-                                if (errorCode == EMError.NETWORK_ERROR) {
-                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.network_anomalies), Toast.LENGTH_SHORT).show();
-                                } else if (errorCode == EMError.USER_ALREADY_EXIST) {
-                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.User_already_exists), Toast.LENGTH_SHORT).show();
-                                } else if (errorCode == EMError.USER_AUTHENTICATION_FAILED) {
-                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.registration_failed_without_permission), Toast.LENGTH_SHORT).show();
-                                } else if (errorCode == EMError.USER_ILLEGAL_ARGUMENT) {
-                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.illegal_user_name), Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.Registration_failed) + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                        @Override
+                        public void onError(final int code, final String error) {
+                            //出现异常,返回主线程进行UI提示
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    if (DialogUtil.isProgressDialogShowing()) {
+                                        DialogUtil.closeProgressDialog();
+                                    }
+                                    if (code == EMError.NETWORK_ERROR) {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.network_anomalies), Toast.LENGTH_SHORT).show();
+                                    } else if (code == EMError.USER_ALREADY_EXIST) {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.User_already_exists), Toast.LENGTH_SHORT).show();
+                                    } else if (code == EMError.USER_AUTHENTICATION_FAILED) {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.registration_failed_without_permission), Toast.LENGTH_SHORT).show();
+                                    } else if (code == EMError.USER_ILLEGAL_ARGUMENT) {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.illegal_user_name), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.Registration_failed) + error, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                            }
-                        });
-                    }
+                            });
+                        }
+                        @Override
+                        public void onProgress(int progress, String status) {
+
+                        }
+                    });
                 }
             }).start();
         } else {

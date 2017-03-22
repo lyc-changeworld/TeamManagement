@@ -11,8 +11,9 @@ import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleActivity;
+import com.example.achuan.teammanagement.model.http.EaseMobHelper;
 import com.example.achuan.teammanagement.util.DialogUtil;
-import com.hyphenate.chat.EMClient;
+import com.hyphenate.EMCallBack;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,8 +76,7 @@ public class AddContactActivity extends SimpleActivity {
             case R.id.btn_add_contact:
                 addContact();
                 break;
-            default:
-                break;
+            default:break;
         }
     }
 
@@ -87,42 +87,46 @@ public class AddContactActivity extends SimpleActivity {
         final String userName = mEtUsername.getText().toString().trim();//用户名
         final String reason=mEtReason.getText().toString().trim();//邀请语
 
-
         DialogUtil.createProgressDialog(this, null,
                 getResources().getString(R.string.Is_sending_a_request),
                 false, false);
 
         new Thread(new Runnable() {
             public void run() {
+                EaseMobHelper.getInstance().addContact(userName, reason, new EMCallBack() {
+                    @Override
+                    public void onSuccess() {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
 
-                try {
-                    // demo写死了个reason，实际应该让用户手动填入
-                    //String s = getResources().getString(R.string.Add_a_friend);
-                    EMClient.getInstance().contactManager().addContact(userName, reason);
-                    runOnUiThread(new Runnable() {
-                        public void run() {
+                                if (DialogUtil.isProgressDialogShowing()) {
+                                    DialogUtil.closeProgressDialog();
+                                }
 
-                            if (DialogUtil.isProgressDialogShowing()) {
-                                DialogUtil.closeProgressDialog();
+                                String s1 = getResources().getString(R.string.send_successful);
+                                Toast.makeText(getApplicationContext(), s1,
+                                        Toast.LENGTH_SHORT).show();
                             }
-
-                            String s1 = getResources().getString(R.string.send_successful);
-                            Toast.makeText(getApplicationContext(), s1,
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } catch (final Exception e) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            if (DialogUtil.isProgressDialogShowing()) {
-                                DialogUtil.closeProgressDialog();
+                        });
+                    }
+                    @Override
+                    public void onError(int code, final String error) {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                if (DialogUtil.isProgressDialogShowing()) {
+                                    DialogUtil.closeProgressDialog();
+                                }
+                                String s2 = getResources().getString(R.string.Request_add_buddy_failure);
+                                Toast.makeText(getApplicationContext(), s2 + error,
+                                        Toast.LENGTH_SHORT).show();
                             }
-                            String s2 = getResources().getString(R.string.Request_add_buddy_failure);
-                            Toast.makeText(getApplicationContext(), s2 + e.getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+                        });
+                    }
+                    @Override
+                    public void onProgress(int progress, String status) {
+
+                    }
+                });
             }
         }).start();
     }

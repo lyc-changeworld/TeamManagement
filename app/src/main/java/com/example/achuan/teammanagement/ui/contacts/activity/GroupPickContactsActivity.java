@@ -14,7 +14,7 @@ import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleActivity;
 import com.example.achuan.teammanagement.model.db.ContactUser;
-import com.example.achuan.teammanagement.model.db.DBManager;
+import com.example.achuan.teammanagement.model.db.LitePalDBHelper;
 import com.example.achuan.teammanagement.ui.contacts.adapter.PickContactAdapter;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
 import com.example.achuan.teammanagement.widget.SideBar;
@@ -91,7 +91,7 @@ public class GroupPickContactsActivity extends SimpleActivity {
         /***2-对列表的布局显示进行设置***/
         //先获取本地联系人集合数据
         mContactUserList= new ArrayList<ContactUser>(
-                DBManager.getContactList().values());
+                LitePalDBHelper.getInstance().getContactList().values());
         /*让数组中的数据按照compareTo方法中的规则返回的结果进行排序*/
         Collections.sort(mContactUserList);
         //适配器和布局对象

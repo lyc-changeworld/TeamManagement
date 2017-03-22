@@ -15,10 +15,11 @@ import android.widget.Toast;
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.app.Constants;
 import com.example.achuan.teammanagement.base.SimpleActivity;
+import com.example.achuan.teammanagement.model.http.EaseMobHelper;
 import com.example.achuan.teammanagement.util.DialogUtil;
+import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMGroupManager;
-import com.hyphenate.exceptions.HyphenateException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -114,64 +115,70 @@ public class NewGroupActivity extends SimpleActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
                             /*-----进行新建群组的相关配置-----*/
-                                //1.获取输入的群组名和简介
-                                String groupName=mEtGroupName.getText().toString().trim();
-                                String desc=mEtDesc.getText().toString().trim();
-                                //2.获取到传递过来的群组初始成员数组
-                                String[] members = data.getStringArrayExtra(Constants.NEW_MEMBERS);
-                                //3.设置邀请成员加入的reason(当前用户+邀请加入+群名称)
-                                String reason=EMClient.getInstance().getCurrentUser()+
-                                        getString(R.string.invite_join_group)+groupName;
-                                //4.创建配置参数的实例对象,然后设置相关属性
-                                EMGroupManager.EMGroupOptions option = new EMGroupManager.EMGroupOptions();
-                                option.maxUsers=200;//设置群组最大用户数(默认200)
-                                //群组人数的设置后续将实现
-                                //判断复选框的选择状态对权限进行设定
+                            //1.获取输入的群组名和简介
+                            String groupName=mEtGroupName.getText().toString().trim();
+                            String desc=mEtDesc.getText().toString().trim();
+                            //2.获取到传递过来的群组初始成员数组
+                            String[] members = data.getStringArrayExtra(Constants.NEW_MEMBERS);
+                            //3.设置邀请成员加入的reason(当前用户+邀请加入+群名称)
+                            String reason=EMClient.getInstance().getCurrentUser()+
+                                    getString(R.string.invite_join_group)+groupName;
+                            //4.创建配置参数的实例对象,然后设置相关属性
+                            EMGroupManager.EMGroupOptions option = new EMGroupManager.EMGroupOptions();
+                            option.maxUsers=200;//设置群组最大用户数(默认200)
+                            //群组人数的设置后续将实现
+                            //判断复选框的选择状态对权限进行设定
                         /*option里的GroupStyle分别为：
                         EMGroupStylePrivateOnlyOwnerInvite——私有群，只有群主可以邀请人；
                         EMGroupStylePrivateMemberCanInvite——私有群，群成员也能邀请人进群；
                         EMGroupStylePublicJoinNeedApproval——公开群，加入此群除了群主邀请，只能通过申请加入此群；
                         EMGroupStylePublicOpenJoin ——公开群，任何人都能加入此群。*/
-                                if(mCbPublic.isChecked()){
-                                    option.style = mCbMemberInviter.isChecked() ?
-                                            EMGroupStylePublicJoinNeedApproval :
-                                            EMGroupStylePublicOpenJoin;
-                                }else{
-                                    option.style = mCbMemberInviter.isChecked()?
-                                            EMGroupStylePrivateMemberCanInvite:
-                                            EMGroupStylePrivateOnlyOwnerInvite;
-                                }
-                                //---执行创建群组的方法
-                                EMClient.getInstance().groupManager().createGroup(
-                                        groupName,desc,members,reason,option);
-                                //回到主线程进行UI更新
-                                runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        if(DialogUtil.isProgressDialogShowing()){
-                                            DialogUtil.closeProgressDialog();
-                                        }
-                                        setResult(RESULT_OK);//告诉上一个活动操作执行成功了
-                                        finish();//结束当前活动
-                                    }
-                                });
-                            } catch (final HyphenateException e) {
-                                e.printStackTrace();
-                                //回到主线程进行UI更新
-                                runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        if(DialogUtil.isProgressDialogShowing()){
-                                            DialogUtil.closeProgressDialog();
-                                        }
-                                        //对异常进行提示
-                                        Toast.makeText(NewGroupActivity.this,
-                                                getString(R.string.Failed_to_create_groups)+
-                                                        e.getLocalizedMessage(),
-                                                Toast.LENGTH_LONG).show();
-                                    }
-                                });
+                            if(mCbPublic.isChecked()){
+                                option.style = mCbMemberInviter.isChecked() ?
+                                        EMGroupStylePublicJoinNeedApproval :
+                                        EMGroupStylePublicOpenJoin;
+                            }else{
+                                option.style = mCbMemberInviter.isChecked()?
+                                        EMGroupStylePrivateMemberCanInvite:
+                                        EMGroupStylePrivateOnlyOwnerInvite;
                             }
+
+                            EaseMobHelper.getInstance().createGroup(groupName, desc, members, reason, option, new EMCallBack() {
+                                @Override
+                                public void onSuccess() {
+                                    //回到主线程进行UI更新
+                                    runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            if(DialogUtil.isProgressDialogShowing()){
+                                                DialogUtil.closeProgressDialog();
+                                            }
+                                            setResult(RESULT_OK);//告诉上一个活动操作执行成功了
+                                            finish();//结束当前活动
+                                        }
+                                    });
+                                }
+                                @Override
+                                public void onError(int code, final String error) {
+                                    //回到主线程进行UI更新
+                                    runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            if(DialogUtil.isProgressDialogShowing()){
+                                                DialogUtil.closeProgressDialog();
+                                            }
+                                            //对异常进行提示
+                                            Toast.makeText(NewGroupActivity.this,
+                                                    getString(R.string.Failed_to_create_groups)+
+                                                            error,
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                                @Override
+                                public void onProgress(int progress, String status) {
+
+                                }
+                            });
                         }
                     }).start();
                 }

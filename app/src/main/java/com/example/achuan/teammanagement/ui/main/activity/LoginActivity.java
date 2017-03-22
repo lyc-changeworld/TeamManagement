@@ -15,7 +15,8 @@ import android.widget.Toast;
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleActivity;
 import com.example.achuan.teammanagement.model.db.ContactUser;
-import com.example.achuan.teammanagement.model.db.DBManager;
+import com.example.achuan.teammanagement.model.db.LitePalDBHelper;
+import com.example.achuan.teammanagement.model.http.EaseMobHelper;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.util.MobUtil;
 import com.example.achuan.teammanagement.util.SharedPreferenceUtil;
@@ -153,7 +154,7 @@ public class LoginActivity extends SimpleActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                EMClient.getInstance().login(userName, password, new EMCallBack() {
+                EaseMobHelper.getInstance().login(userName, password, new EMCallBack() {
                     @Override
                     public void onSuccess() {
                         //LogUtil.d(TAG,"登录成功");
@@ -191,12 +192,10 @@ public class LoginActivity extends SimpleActivity {
                                 finish();
                             }
                         });
+
                     }
                     @Override
-                    public void onProgress(int progress, String status) {
-                    }
-                    @Override
-                    public void onError(final int code, final String message) {
+                    public void onError(final int code, final String error) {
                         //发生错误时,在主线程中进行警告提示
                         runOnUiThread(new Runnable() {
                             public void run() {
@@ -226,7 +225,7 @@ public class LoginActivity extends SimpleActivity {
                                             Toast.LENGTH_SHORT).show();
                                 } else {
                                     Toast.makeText(getApplicationContext(),
-                                            getString(R.string.Login_failed) + message,
+                                            getString(R.string.Login_failed) + error,
                                             Toast.LENGTH_SHORT).show();
                                 }
                                 //用来测试获取错误码,错误码对应错误信息见以下地址:
@@ -235,6 +234,10 @@ public class LoginActivity extends SimpleActivity {
                                 Toast.LENGTH_SHORT).show();*/
                             }
                         });
+                    }
+                    @Override
+                    public void onProgress(int progress, String status) {
+
                     }
                 });
             }
@@ -261,7 +264,7 @@ public class LoginActivity extends SimpleActivity {
                         users.put(username, user);
                     }
                     //保存联系人到本地数据库
-                    DBManager.saveContactList(new ArrayList<ContactUser>(users.values()));
+                    LitePalDBHelper.getInstance().saveContactList(new ArrayList<ContactUser>(users.values()));
                 } catch (HyphenateException e) {
                     e.printStackTrace();
                 }

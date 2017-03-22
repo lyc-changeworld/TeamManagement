@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.achuan.teammanagement.R;
-import com.example.achuan.teammanagement.model.db.DBManager;
+import com.example.achuan.teammanagement.model.db.LitePalDBHelper;
 import com.example.achuan.teammanagement.model.db.InviteMessage;
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.hyphenate.chat.EMClient;
@@ -275,7 +275,7 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
                     //更新状态为:我同意了对方的请求
                     /***对数据库进行更新状态操作***/
                     //......疑问:并没有设置msg的id号,不清楚这里是怎么通过id号更新状态的,后续需要解决弄懂
-                    DBManager.updateMessage(
+                    LitePalDBHelper.getInstance().updateMessage(
                             msg.getId(),//消息的id号
                             InviteMessage.InviteMesageStatus.AGREED.ordinal());//对应状态在枚举类中的序数
 
@@ -354,7 +354,7 @@ public class NewFriendsMsgAdapter extends RecyclerView.Adapter<NewFriendsMsgAdap
                     //更新状态为:我拒绝了对方的请求
                     /***对数据库进行更新状态操作***/
                     //......疑问:并没有设置msg的id号,不清楚这里是怎么通过id号更新状态的,后续需要解决弄懂
-                    DBManager.updateMessage(
+                    LitePalDBHelper.getInstance().updateMessage(
                             msg.getId(),//消息的id号
                             InviteMessage.InviteMesageStatus.REFUSED.ordinal());//对应状态在枚举类中的序数
 

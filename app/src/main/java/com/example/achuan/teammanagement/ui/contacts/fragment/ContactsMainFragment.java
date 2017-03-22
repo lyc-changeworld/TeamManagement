@@ -15,7 +15,8 @@ import android.widget.TextView;
 import com.example.achuan.teammanagement.R;
 import com.example.achuan.teammanagement.base.SimpleFragment;
 import com.example.achuan.teammanagement.model.db.ContactUser;
-import com.example.achuan.teammanagement.model.db.DBManager;
+import com.example.achuan.teammanagement.model.db.LitePalDBHelper;
+import com.example.achuan.teammanagement.model.http.EaseMobHelper;
 import com.example.achuan.teammanagement.ui.contacts.activity.GroupsActivity;
 import com.example.achuan.teammanagement.ui.contacts.activity.NewFriendsMsgActivity;
 import com.example.achuan.teammanagement.ui.contacts.adapter.ContactAdapter;
@@ -23,6 +24,7 @@ import com.example.achuan.teammanagement.ui.conversation.activity.MyChatActivity
 import com.example.achuan.teammanagement.util.DialogUtil;
 import com.example.achuan.teammanagement.widget.RyItemDivider;
 import com.example.achuan.teammanagement.widget.SideBar;
+import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.easeui.EaseConstant;
 import com.hyphenate.exceptions.HyphenateException;
@@ -198,28 +200,35 @@ public class ContactsMainFragment extends SimpleFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    //执行删除好友的操作
-                    EMClient.getInstance().contactManager().deleteContact(username);
-                    //本地数据库删除联系人
-                    DBManager.deleteContact(username);
-                    /*回到主线程进行UI更新*/
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (DialogUtil.isProgressDialogShowing()) {
-                                DialogUtil.closeProgressDialog();
+                EaseMobHelper.getInstance().deleteContact(username, new EMCallBack() {
+                    @Override
+                    public void onSuccess() {
+                        //本地数据库删除联系人
+                        LitePalDBHelper.getInstance().deleteContact(username);
+                        /*回到主线程进行UI更新*/
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (DialogUtil.isProgressDialogShowing()) {
+                                    DialogUtil.closeProgressDialog();
+                                }
+                                //刷新列表显示
+                                //mContactUserList.remove(postion);
+                                //调用下面的方法进行数据刷新比较保险,
+                                //之前用notifyItemRemoved(postion)时出现了数据更新不及时的情况
+                                //mContactAdapter.notifyDataSetChanged();
                             }
-                            //刷新列表显示
-                            //mContactUserList.remove(postion);
-                            //调用下面的方法进行数据刷新比较保险,
-                            //之前用notifyItemRemoved(postion)时出现了数据更新不及时的情况
-                            //mContactAdapter.notifyDataSetChanged();
-                        }
-                    });
-                } catch (HyphenateException e) {
-                    e.printStackTrace();
-                }
+                        });
+                    }
+                    @Override
+                    public void onError(int code, String error) {
+
+                    }
+                    @Override
+                    public void onProgress(int progress, String status) {
+
+                    }
+                });
             }
         }).start();
     }
@@ -249,7 +258,7 @@ public class ContactsMainFragment extends SimpleFragment {
          * 注意：这部分建议使用include<>文件包裹为头部布局</>*/
         mContactUserList.clear();//清空
         //getContactList();//过滤黑名单及排序
-        mContactUserList.addAll(DBManager.getContactList().values());
+        mContactUserList.addAll(LitePalDBHelper.getInstance().getContactList().values());
         /*让数组中的数据按照compareTo方法中的规则返回的结果进行排序*/
         Collections.sort(mContactUserList);//联系人排好序的集合
         mContactUserList.add(0, topTwo);//第二行(群聊)
@@ -262,7 +271,7 @@ public class ContactsMainFragment extends SimpleFragment {
     protected void getContactList() {
         //mContactUserList.clear();
         //先获取本地联系人数据集合
-        contactsMap = DBManager.getContactList();
+        contactsMap = LitePalDBHelper.getInstance().getContactList();
         if (contactsMap.isEmpty()) {
             return;
         }
@@ -293,22 +302,6 @@ public class ContactsMainFragment extends SimpleFragment {
                 }
             }
         }
-        /*// 排序
-        Collections.sort(mContactUserList, new Comparator<ContactUser>() {
-            @Override
-            public int compare(ContactUser o1, ContactUser o2) {
-                if (o1.getInitialLetter().equals(o2.getInitialLetter())) {
-                    return o1.getNick().compareTo(o2.getNick());
-                } else {
-                    if ("#".equals(o1.getInitialLetter())) {
-                        return 1;
-                    } else if ("#".equals(o2.getInitialLetter())) {
-                        return -1;
-                    }
-                    return o1.getInitialLetter().compareTo(o2.getInitialLetter());
-                }
-            }
-        });*/
     }
 
     /*添加到黑名单*/
@@ -330,7 +323,7 @@ public class ContactsMainFragment extends SimpleFragment {
                     // false，则我能给黑名单的中用户发消息，但是对方发给我时我是收不到的
                     EMClient.getInstance().contactManager().addUserToBlackList(username, true);
                     //本地数据库删除联系人
-                    DBManager.deleteContact(username);
+                    LitePalDBHelper.getInstance().deleteContact(username);
                     /*回到主线程进行UI更新*/
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
